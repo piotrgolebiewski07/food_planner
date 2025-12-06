@@ -6,7 +6,5 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 
-@app.route('/')
-def index():
-    return 'This will be a food planner'
+from
 
