@@ -1,6 +1,6 @@
 # environment
 .env
-
+.flaskenv
 
 # virtual environments
 venv/
