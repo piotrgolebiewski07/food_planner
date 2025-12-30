@@ -1,0 +1,37 @@
+[
+  {
+    "name": "flour wheat",
+    "calories": 364,
+    "unit": "g"
+  },
+  {
+    "name": "milk",
+    "calories": 42,
+    "unit": "ml"
+  },
+  {
+    "name": "milk lactose-free",
+    "calories": 42,
+    "unit": "ml"
+  },
+  {
+    "name": "buttermilk",
+    "calories": 40,
+    "unit": "ml"
+  },
+  {
+    "name": "kefir",
+    "calories": 41,
+    "unit": "ml"
+  },
+  {
+    "name": "yogurt natural",
+    "calories": 59,
+    "unit": "g"
+  },
+  {
+    "name": "egg",
+    "calories": 155,
+    "unit": "g"
+  }
+]
