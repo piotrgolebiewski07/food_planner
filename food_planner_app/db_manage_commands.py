@@ -4,6 +4,7 @@ from food_planner_app import app, db
 from food_planner_app.models import Ingredient
 from sqlalchemy import text
 
+
 @app.cli.group()
 def db_manage():
     """Database management commands"""
