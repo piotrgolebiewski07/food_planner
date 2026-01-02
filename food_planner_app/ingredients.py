@@ -42,12 +42,12 @@ def get_ingredient(ingredient_id: int):
 
 @app.route('/api/v1/ingredients', methods=['POST'])
 def create_ingredient():
-    data = request.get_json()
+    data = request.get_json(silent=True)
 
     if not data:
         return jsonify({
             'success': False,
-            'data': 'Request body must be json'
+            'message': 'Request body must be json'
         }), 400
 
     ingredient = Ingredient(
@@ -76,9 +76,30 @@ def create_ingredient():
 
 @app.route('/api/v1/ingredients/<int:ingredient_id>', methods=['PUT'])
 def update_ingredient(ingredient_id: int):
+    ingredient = Ingredient.query.get_or_404(ingredient_id)
+    data = request.get_json(silent=True)
+
+    if not data:
+        return jsonify({
+            'success': False,
+            'message': 'Request body must be valid JSON'
+        }), 400
+
+    ingredient.name = data.get("name", ingredient.name)
+    ingredient.calories = data.get("calories", ingredient.calories)
+    ingredient.unit = data.get("unit", ingredient.unit)
+
+    db.session.commit()
+
     return jsonify({
         'success': True,
-        'data': f'Ingredient with id {ingredient_id} has been updated'
+        'data': {
+            'id': ingredient.id,
+            'name': ingredient.name,
+            'calories': ingredient.calories,
+            'unit': ingredient.unit
+        },
+        'message': f'Ingredient with id {ingredient_id} has been updated'
     })
 
 
@@ -86,8 +107,11 @@ def update_ingredient(ingredient_id: int):
 def delete_ingredient(ingredient_id: int):
     ingredient = Ingredient.query.get_or_404(ingredient_id)
 
+    db.session.delete(ingredient)
+    db.session.commit()
+
     return jsonify({
         'success': True,
-        'data': f'Ingredient with id {ingredient_id} has been deleted'
-    })
+        'message': f'Ingredient with id {ingredient_id} has been deleted'
+    }), 200
 
