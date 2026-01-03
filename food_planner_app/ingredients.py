@@ -2,7 +2,7 @@ from flask import jsonify, request
 from webargs.flaskparser import use_args
 from food_planner_app import app, db
 from food_planner_app.models import Ingredient, IngredientSchema, ingredient_schema
-
+from food_planner_app.utils import validate_json_content_type
 
 @app.route('/api/v1/ingredients', methods=['GET'])
 def get_ingredients():
@@ -26,7 +26,8 @@ def get_ingredient(ingredient_id: int):
 
 
 @app.route('/api/v1/ingredients', methods=['POST'])
-@use_args(ingredient_schema)
+@validate_json_content_type
+@use_args(ingredient_schema, error_status_code=400)
 def create_ingredient(args: dict):
     ingredient = Ingredient(**args)
 
@@ -40,12 +41,13 @@ def create_ingredient(args: dict):
 
 
 @app.route('/api/v1/ingredients/<int:ingredient_id>', methods=['PUT'])
-@use_args(IngredientSchema(partial=True))
+@validate_json_content_type
+@use_args(IngredientSchema(partial=True),  error_status_code=400)
 def update_ingredient(args: dict, ingredient_id: int):
     ingredient = Ingredient.query.get_or_404(ingredient_id, description=f'Ingredient with id {ingredient_id} not found')
 
-    for key, value in args.items():
-        setattr(ingredient, key, value)
+    for key, values in args.items():
+        setattr(ingredient, key, values)
 
     db.session.commit()
 
