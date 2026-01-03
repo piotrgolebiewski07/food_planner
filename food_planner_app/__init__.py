@@ -12,5 +12,6 @@ migrate = Migrate(app, db)
 from food_planner_app import ingredients
 from food_planner_app import models
 from food_planner_app import db_manage_commands
+from food_planner_app import errors
 
 
