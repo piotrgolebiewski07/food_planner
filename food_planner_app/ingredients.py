@@ -1,111 +1,63 @@
 from flask import jsonify, request
+from webargs.flaskparser import use_args
 from food_planner_app import app, db
-from food_planner_app.models import Ingredient
+from food_planner_app.models import Ingredient, IngredientSchema, ingredient_schema
 
 
 @app.route('/api/v1/ingredients', methods=['GET'])
 def get_ingredients():
     ingredients = Ingredient.query.all()
-
-    data = [
-        {
-            "id": ingredient.id,
-            "name": ingredient.name,
-            "calories": ingredient.calories,
-            "unit": ingredient.unit
-        }
-        for ingredient in ingredients
-    ]
+    ingredient_schema = IngredientSchema(many=True)
 
     return jsonify({
         'success': True,
-        'count': len(data),
-        'data': data
+        'data': ingredient_schema.dump(ingredients),
+        'number of records': len(ingredients)
     })
 
 
 @app.route('/api/v1/ingredients/<int:ingredient_id>', methods=['GET'])
 def get_ingredient(ingredient_id: int):
-    ingredient = Ingredient.query.get_or_404(ingredient_id)
-    data = {
-            "id": ingredient.id,
-            "name": ingredient.name,
-            "calories": ingredient.calories,
-            "unit": ingredient.unit
-    }
-
+    ingredient = Ingredient.query.get_or_404(ingredient_id, description=f'Ingredient with id {ingredient_id} not found')
     return jsonify({
         'success': True,
-        'data': data
+        'data': ingredient_schema.dump(ingredient)
     })
 
 
 @app.route('/api/v1/ingredients', methods=['POST'])
-def create_ingredient():
-    data = request.get_json(silent=True)
-
-    if not data:
-        return jsonify({
-            'success': False,
-            'message': 'Request body must be json'
-        }), 400
-
-    ingredient = Ingredient(
-        name=data.get("name"),
-        calories=data.get("calories"),
-        unit=data.get("unit","g")
-    )
+@use_args(ingredient_schema)
+def create_ingredient(args: dict):
+    ingredient = Ingredient(**args)
 
     db.session.add(ingredient)
     db.session.commit()
 
-    response_data = {
-        "id":  ingredient.id,
-        "name":ingredient.name,
-        "calories": ingredient.calories,
-        "unit": ingredient.unit
-
-    }
-
     return jsonify({
         "success": True,
-        "data": response_data
+        "data": ingredient_schema.dump(ingredient)
     }), 201
 
 
-
 @app.route('/api/v1/ingredients/<int:ingredient_id>', methods=['PUT'])
-def update_ingredient(ingredient_id: int):
-    ingredient = Ingredient.query.get_or_404(ingredient_id)
-    data = request.get_json(silent=True)
+@use_args(IngredientSchema(partial=True))
+def update_ingredient(args: dict, ingredient_id: int):
+    ingredient = Ingredient.query.get_or_404(ingredient_id, description=f'Ingredient with id {ingredient_id} not found')
 
-    if not data:
-        return jsonify({
-            'success': False,
-            'message': 'Request body must be valid JSON'
-        }), 400
-
-    ingredient.name = data.get("name", ingredient.name)
-    ingredient.calories = data.get("calories", ingredient.calories)
-    ingredient.unit = data.get("unit", ingredient.unit)
+    for key, value in args.items():
+        setattr(ingredient, key, value)
 
     db.session.commit()
 
     return jsonify({
         'success': True,
-        'data': {
-            'id': ingredient.id,
-            'name': ingredient.name,
-            'calories': ingredient.calories,
-            'unit': ingredient.unit
-        },
-        'message': f'Ingredient with id {ingredient_id} has been updated'
+        'data': ingredient_schema.dump(ingredient)
     })
 
 
 @app.route('/api/v1/ingredients/<int:ingredient_id>', methods=['DELETE'])
 def delete_ingredient(ingredient_id: int):
-    ingredient = Ingredient.query.get_or_404(ingredient_id)
+    ingredient = Ingredient.query.get_or_404(ingredient_id, description=f'Ingredient with id {ingredient_id} not found')
 
     db.session.delete(ingredient)
     db.session.commit()
@@ -113,5 +65,4 @@ def delete_ingredient(ingredient_id: int):
     return jsonify({
         'success': True,
         'message': f'Ingredient with id {ingredient_id} has been deleted'
-    }), 200
-
+    })

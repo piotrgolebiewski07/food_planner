@@ -1,5 +1,5 @@
 from food_planner_app import db
-
+from marshmallow import Schema, fields, validate
 
 class Ingredient(db.Model):
     __tablename__ = 'ingredients'
@@ -11,4 +11,14 @@ class Ingredient(db.Model):
 
     def __repr__(self):
         return f"<Ingredient {self.name}>"
+
+
+class IngredientSchema(Schema):
+    id = fields.Integer(dump_only=True)
+    name = fields.String(required=True, validate=validate.Length(min=2, max=50))
+    calories = fields.Float(required=True, validate=validate.Range(min=0))
+    unit = fields.String(required=True, validate=validate.Length(max=10))
+
+
+ingredient_schema = IngredientSchema()
 
