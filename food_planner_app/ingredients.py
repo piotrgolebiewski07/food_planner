@@ -6,8 +6,11 @@ from food_planner_app.utils import validate_json_content_type
 
 @app.route('/api/v1/ingredients', methods=['GET'])
 def get_ingredients():
-    ingredients = Ingredient.query.all()
-    ingredient_schema = IngredientSchema(many=True)
+    query = Ingredient.query
+    schema_args = Ingredient.get_schema_args(request.args.get('fields'))
+    query = Ingredient.apply_order(query, request.args.get('sort'))
+    ingredients = query.all()
+    ingredient_schema = IngredientSchema(**schema_args)
 
     return jsonify({
         'success': True,

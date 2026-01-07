@@ -1,6 +1,7 @@
 from food_planner_app import db
 from marshmallow import Schema, fields, validate
 
+
 class Ingredient(db.Model):
     __tablename__ = 'ingredients'
 
@@ -12,6 +13,25 @@ class Ingredient(db.Model):
     def __repr__(self):
         return f"<Ingredient {self.name}>"
 
+    @staticmethod  # metoda statyczna (chyba nie wymaga self)
+    def get_schema_args(fields: str) -> dict:
+        schema_args = {'many': True}
+        if fields:
+            schema_args['only'] = [field for field in fields.split(',') if field in Ingredient.__table__.columns.keys()]
+        return schema_args
+
+    @staticmethod
+    def apply_order(query, sort_keys: str):
+        if sort_keys:
+            for key in sort_keys.split(','):
+                desc = False
+                if key.startswith('-'):
+                    key = key[1:]
+                    desc = True
+                column_attr = getattr(Ingredient, key, None)
+                if column_attr is not None:
+                    query = query.order_by(column_attr.desc()) if desc else query.order_by(column_attr)
+        return query
 
 class IngredientSchema(Schema):
     id = fields.Integer(dump_only=True)
