@@ -5,7 +5,7 @@ It serves as a foundation for a future meal-planning system that will manage ing
 recipes, and meal schedules.
 
 The current version focuses on core backend architecture and database integration and is
-designed as a learning and portfolio project.
+designed as a learning and portfolio-oriented backend project.
 
 ## Features
 
@@ -16,6 +16,7 @@ designed as a learning and portfolio project.
 - Modular application design
 - CLI commands for database seeding
 - Easily extendable for future modules (recipes, meals, planner)
+- Flexible query filtering and sorting for API resources
 
 ## Tech Stack
 
@@ -64,3 +65,13 @@ food_planner.py
 
 This project is intentionally kept lightweight and readable.
 It is intended as a foundation for further backend and data-oriented development.
+
+## Query examples
+
+The API supports basic filtering, sorting and field selection via query parameters.
+
+Examples:
+
+- GET /api/v1/ingredients?calories[gte]=100
+- GET /api/v1/ingredients?unit[ne]=g
+- GET /api/v1/ingredients?fields=name,calories&sort=-calories
