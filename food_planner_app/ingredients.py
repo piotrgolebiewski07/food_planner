@@ -9,6 +9,7 @@ def get_ingredients():
     query = Ingredient.query
     schema_args = Ingredient.get_schema_args(request.args.get('fields'))
     query = Ingredient.apply_order(query, request.args.get('sort'))
+    query = Ingredient.apply_filter(query, request.args)
     ingredients = query.all()
     ingredient_schema = IngredientSchema(**schema_args)
 
