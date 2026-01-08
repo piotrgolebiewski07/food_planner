@@ -1,9 +1,11 @@
 import re
 from food_planner_app import db
 from marshmallow import Schema, fields, validate
-from werkzeug.datastructures import ImmutableDict
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.sql.expression import BinaryExpression
+from flask import request, url_for
+from food_planner_app import Config
+
 
 COMPARISON_OPERATORS_RE = re.compile(r'(.*)\[(gte|gt|lte|lt|ne)\]')
 
@@ -19,7 +21,7 @@ class Ingredient(db.Model):
     def __repr__(self):
         return f"<Ingredient {self.name}>"
 
-    @staticmethod  # metoda statyczna (chyba nie wymaga self)
+    @staticmethod
     def get_schema_args(fields: str) -> dict:
         schema_args = {'many': True}
         if fields:
@@ -52,9 +54,9 @@ class Ingredient(db.Model):
         return operator_mapping[operator]
 
     @staticmethod
-    def apply_filter(query, params: ImmutableDict):
-        for param, value in params.items():
-            if param not in {'fields', 'sort'}:
+    def apply_filter(query):
+        for param, value in request.args.items():
+            if param not in {'fields', 'sort', 'page', 'limit'}:
                 operator = '=='
                 match = COMPARISON_OPERATORS_RE.match(param)
                 if match is not None:
@@ -64,6 +66,34 @@ class Ingredient(db.Model):
                     filter_argument = Ingredient.get_filter_argument(column_attr, value, operator)
                     query = query.filter(filter_argument)
         return query
+
+    @staticmethod
+    def get_pagination(stmt):
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('limit', Config.PER_PAGE, type=int)
+
+        params = {key: value for key, value in request.args.items() if key != 'page'}
+
+        pagination_obj = db.paginate(
+            stmt,
+            page=page,
+            per_page=per_page,
+            error_out=False
+        )
+
+        pagination = {
+            'total_pages': pagination_obj.pages,
+            'total_records': pagination_obj.total,
+            'current_page': url_for('get_ingredients', page=page, **params)
+        }
+
+        if pagination_obj.has_next:
+            pagination['next_page'] = url_for('get_ingredients', page=page + 1, **params)
+
+        if pagination_obj.has_prev:
+            pagination['previous_page'] = url_for('get_ingredients', page=page - 1, **params)
+
+        return pagination_obj.items, pagination
 
 
 class IngredientSchema(Schema):

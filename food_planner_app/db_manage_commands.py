@@ -19,7 +19,7 @@ def add_data():
         with open(ingredients_path) as file:
             data_json = json.load(file)
         for item in data_json:
-            ingredient = Ingredient(**item)  #**wypakowywanie
+            ingredient = Ingredient(**item)
             db.session.add(ingredient)
         db.session.commit()
     except Exception as exc:

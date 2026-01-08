@@ -3,20 +3,23 @@ from webargs.flaskparser import use_args
 from food_planner_app import app, db
 from food_planner_app.models import Ingredient, IngredientSchema, ingredient_schema
 from food_planner_app.utils import validate_json_content_type
+from sqlalchemy import select
+
 
 @app.route('/api/v1/ingredients', methods=['GET'])
 def get_ingredients():
-    query = Ingredient.query
+    query = select(Ingredient)
     schema_args = Ingredient.get_schema_args(request.args.get('fields'))
     query = Ingredient.apply_order(query, request.args.get('sort'))
-    query = Ingredient.apply_filter(query, request.args)
-    ingredients = query.all()
-    ingredient_schema = IngredientSchema(**schema_args)
+    query = Ingredient.apply_filter(query)
+    items, pagination = Ingredient.get_pagination(query)
+    ingredients = IngredientSchema(**schema_args).dump(items)
 
     return jsonify({
         'success': True,
-        'data': ingredient_schema.dump(ingredients),
-        'number of records': len(ingredients)
+        'data': ingredients,
+        'records on page': len(ingredients),
+        'pagination': pagination
     })
 
 
