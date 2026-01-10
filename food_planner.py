@@ -1,2 +1,4 @@
-from food_planner_app import app
+from food_planner_app import create_app
+
+app = create_app()
 

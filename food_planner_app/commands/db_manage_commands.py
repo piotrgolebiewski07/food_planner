@@ -1,11 +1,11 @@
 import json
 from pathlib import Path
-from food_planner_app import app, db
+from food_planner_app import db
 from food_planner_app.models import Ingredient
 from sqlalchemy import text
+from food_planner_app.commands import db_manage_bp
 
-
-@app.cli.group()
+@db_manage_bp.cli.group()
 def db_manage():
     """Database management commands"""
     pass
@@ -15,7 +15,7 @@ def db_manage():
 def add_data():
     """Add sample data to database"""
     try:
-        ingredients_path = Path(__file__).parent / 'samples' / 'ingredients.json'
+        ingredients_path = Path(__file__).parent.parent / 'samples' / 'ingredients.json'
         with open(ingredients_path) as file:
             data_json = json.load(file)
         for item in data_json:

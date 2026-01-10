@@ -84,14 +84,14 @@ class Ingredient(db.Model):
         pagination = {
             'total_pages': pagination_obj.pages,
             'total_records': pagination_obj.total,
-            'current_page': url_for('get_ingredients', page=page, **params)
+            'current_page': url_for('ingredients.get_ingredients', page=page, **params)
         }
 
         if pagination_obj.has_next:
-            pagination['next_page'] = url_for('get_ingredients', page=page + 1, **params)
+            pagination['next_page'] = url_for('ingredients.get_ingredients', page=page + 1, **params)
 
         if pagination_obj.has_prev:
-            pagination['previous_page'] = url_for('get_ingredients', page=page - 1, **params)
+            pagination['previous_page'] = url_for('ingredients.get_ingredients', page=page - 1, **params)
 
         return pagination_obj.items, pagination
 
