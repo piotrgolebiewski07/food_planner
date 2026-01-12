@@ -96,6 +96,17 @@ class Ingredient(db.Model):
         return pagination_obj.items, pagination
 
 
+class Recipe(db.Model):
+    __tablename__ = 'recipes'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    description = db.Column(db.Text)
+    servings = db.Column(db.Integer, nullable=False, default=1)
+
+    def __repr__(self):
+        return f"<Recipe {self.name}>"
+
 class IngredientSchema(Schema):
     id = fields.Integer(dump_only=True)
     name = fields.String(required=True, validate=validate.Length(min=2, max=50))
