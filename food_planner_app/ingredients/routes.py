@@ -1,8 +1,8 @@
-from flask import jsonify, request
+from flask import jsonify
 from webargs.flaskparser import use_args
 from food_planner_app import db
 from food_planner_app.models import Ingredient, IngredientSchema, ingredient_schema
-from food_planner_app.utils import validate_json_content_type
+from food_planner_app.utils import validate_json_content_type, get_schema_args, apply_order, apply_filter, get_pagination
 from sqlalchemy import select
 from food_planner_app.ingredients import ingredients_bp
 
@@ -10,10 +10,10 @@ from food_planner_app.ingredients import ingredients_bp
 @ingredients_bp.route('/ingredients', methods=['GET'])
 def get_ingredients():
     query = select(Ingredient)
-    schema_args = Ingredient.get_schema_args(request.args.get('fields'))
-    query = Ingredient.apply_order(query, request.args.get('sort'))
-    query = Ingredient.apply_filter(query)
-    items, pagination = Ingredient.get_pagination(query)
+    schema_args = get_schema_args(Ingredient)
+    query = apply_order(Ingredient, query)
+    query = apply_filter(Ingredient, query)
+    items, pagination = get_pagination(query, 'ingredients.get_ingredients')
     ingredients = IngredientSchema(**schema_args).dump(items)
 
     return jsonify({
