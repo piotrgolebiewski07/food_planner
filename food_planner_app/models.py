@@ -1,107 +1,66 @@
-import re
 from food_planner_app import db
-from marshmallow import Schema, fields, validate
-from sqlalchemy.orm.attributes import InstrumentedAttribute
-from sqlalchemy.sql.expression import BinaryExpression
-from flask import request, url_for
-from food_planner_app import Config
-
-
-COMPARISON_OPERATORS_RE = re.compile(r'(.*)\[(gte|gt|lte|lt|ne)\]')
+from marshmallow import Schema, fields, validate, EXCLUDE
+from decimal import Decimal
 
 
 class Ingredient(db.Model):
     __tablename__ = 'ingredients'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False, unique=True)
-    calories = db.Column(db.Float, nullable=False)  # kcal per 100g or 1 pc
-    unit = db.Column(db.String(20), nullable=False, default="g")    # g/ml/pcs
+    name = db.Column(db.String(50), nullable=False, unique=True)
+    calories = db.Column(db.Numeric(6,2), nullable=False)  # kcal per 100g or 1 pc
+    unit = db.Column(db.String(10), nullable=False, default="g")    # g/ml/pcs
 
     def __repr__(self):
         return f"<Ingredient {self.name}>"
 
-    @staticmethod
-    def get_schema_args(fields: str) -> dict:
-        schema_args = {'many': True}
-        if fields:
-            schema_args['only'] = [field for field in fields.split(',') if field in Ingredient.__table__.columns.keys()]
-        return schema_args
 
-    @staticmethod
-    def apply_order(query, sort_keys: str):
-        if sort_keys:
-            for key in sort_keys.split(','):
-                desc = False
-                if key.startswith('-'):
-                    key = key[1:]
-                    desc = True
-                column_attr = getattr(Ingredient, key, None)
-                if column_attr is not None:
-                    query = query.order_by(column_attr.desc()) if desc else query.order_by(column_attr)
-        return query
+class Recipe(db.Model):
+    __tablename__ = 'recipes'
 
-    @staticmethod
-    def get_filter_argument(column_name: InstrumentedAttribute, value: str, operator: str) -> BinaryExpression:
-        operator_mapping = {
-            '==': column_name == value,
-            'gte': column_name >= value,
-            'gt': column_name > value,
-            'lte': column_name <= value,
-            'lt': column_name < value,
-            'ne': column_name != value
-        }
-        return operator_mapping[operator]
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False, unique=True)
 
-    @staticmethod
-    def apply_filter(query):
-        for param, value in request.args.items():
-            if param not in {'fields', 'sort', 'page', 'limit'}:
-                operator = '=='
-                match = COMPARISON_OPERATORS_RE.match(param)
-                if match is not None:
-                    param, operator = match.groups()
-                column_attr = getattr(Ingredient, param, None)
-                if column_attr is not None:
-                    filter_argument = Ingredient.get_filter_argument(column_attr, value, operator)
-                    query = query.filter(filter_argument)
-        return query
+    description = db.Column(db.Text)
+    servings = db.Column(db.Integer, nullable=False, default=1)
 
-    @staticmethod
-    def get_pagination(stmt):
-        page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('limit', Config.PER_PAGE, type=int)
+    ingredients = db.relationship("RecipeIngredient", back_populates="recipe", cascade="all, delete-orphan", lazy="joined")
 
-        params = {key: value for key, value in request.args.items() if key != 'page'}
+    def __repr__(self):
+        return f"<Recipe {self.name}>"
 
-        pagination_obj = db.paginate(
-            stmt,
-            page=page,
-            per_page=per_page,
-            error_out=False
-        )
 
-        pagination = {
-            'total_pages': pagination_obj.pages,
-            'total_records': pagination_obj.total,
-            'current_page': url_for('ingredients.get_ingredients', page=page, **params)
-        }
+class RecipeIngredient(db.Model):
+    __tablename__ = "recipe_ingredients"
 
-        if pagination_obj.has_next:
-            pagination['next_page'] = url_for('ingredients.get_ingredients', page=page + 1, **params)
+    recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"), primary_key=True)
+    ingredient_id = db.Column(db.Integer, db.ForeignKey("ingredients.id"), primary_key=True)
+    amount = db.Column(db.Numeric(6,2), nullable=False)
 
-        if pagination_obj.has_prev:
-            pagination['previous_page'] = url_for('ingredients.get_ingredients', page=page - 1, **params)
-
-        return pagination_obj.items, pagination
+    recipe = db.relationship("Recipe", back_populates="ingredients")
+    ingredient = db.relationship("Ingredient")
 
 
 class IngredientSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
+
     id = fields.Integer(dump_only=True)
     name = fields.String(required=True, validate=validate.Length(min=2, max=50))
-    calories = fields.Float(required=True, validate=validate.Range(min=0))
-    unit = fields.String(required=True, validate=validate.Length(max=10))
+    calories = fields.Decimal(required=True, places=2, rounding=None, validate=validate.Range(min=Decimal("0.00")))
+    unit = fields.String(required=True, validate=validate.OneOf(["g", "ml", "pcs"]))
+
+
+class RecipeSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
+
+    id = fields.Integer(dump_only=True)
+    name = fields.String(required=True, validate=validate.Length(min=2, max=50))
+    description = fields.String(required=True, validate=validate.Length(min=2))
+    servings = fields.Integer(required=True, validate=validate.Range(min=1))
 
 
 ingredient_schema = IngredientSchema()
+recipe_schema = RecipeSchema()
 
