@@ -12,6 +12,7 @@ def load_json_data(file_name: str) -> list:
         data_json = json.load(file)
         return data_json
 
+
 @db_manage_bp.cli.group()
 def db_manage():
     """Database management commands"""
