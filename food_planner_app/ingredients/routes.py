@@ -4,7 +4,9 @@ from food_planner_app import db
 from food_planner_app.models import Ingredient, IngredientSchema, ingredient_schema
 from food_planner_app.utils import validate_json_content_type, get_schema_args, apply_order, apply_filter, get_pagination
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from food_planner_app.ingredients import ingredients_bp
+
 
 
 @ingredients_bp.route('/ingredients', methods=['GET'])
@@ -39,8 +41,15 @@ def get_ingredient(ingredient_id: int):
 def create_ingredient(args: dict):
     ingredient = Ingredient(**args)
 
-    db.session.add(ingredient)
-    db.session.commit()
+    try:
+        db.session.add(ingredient)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({
+            "success": False,
+            "error": "Ingredient with this name already exists"
+        }), 409
 
     return jsonify({
         "success": True,

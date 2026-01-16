@@ -5,6 +5,7 @@ from food_planner_app.recipes import recipes_bp
 from food_planner_app.models import Recipe, RecipeSchema, recipe_schema
 from food_planner_app.utils import validate_json_content_type, get_schema_args, apply_order, apply_filter, get_pagination
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 
 
 @recipes_bp.route('/recipes', methods=['GET'])
@@ -40,8 +41,15 @@ def get_recipe(recipe_id: int):
 def create_recipe(args: dict):
     recipe = Recipe(**args)
 
-    db.session.add(recipe)
-    db.session.commit()
+    try:
+        db.session.add(recipe)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({
+            "success": False,
+            "error": "Recipe with this name already exists"
+        }), 409
 
     return jsonify({
         "success": True,
