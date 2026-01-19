@@ -1,3 +1,4 @@
+from datetime import datetime
 from food_planner_app import db
 from marshmallow import Schema, fields, validate, EXCLUDE
 from decimal import Decimal
@@ -28,6 +29,15 @@ class Recipe(db.Model):
 
     def __repr__(self):
         return f"<Recipe {self.name}>"
+
+
+class User(db.Model):
+    __tablename__ = ('users')
+    id = db.Column(db.Integer, primary_key=True)
+    user_name = db.Column(db.String(255), nullable=False, unique=True, index=True)
+    email = db.Column(db.String(255), nullable=False, unique=True)
+    password = db.Column(db.String(255), nullable=False)
+    creation_date = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 class RecipeIngredient(db.Model):
