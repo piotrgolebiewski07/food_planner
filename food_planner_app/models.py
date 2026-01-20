@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from food_planner_app import db
 from marshmallow import Schema, fields, validate, EXCLUDE
 from decimal import Decimal
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class Ingredient(db.Model):
@@ -45,6 +45,9 @@ class User(db.Model):
     @staticmethod
     def generate_hashed_password(password: str) -> str:
         return generate_password_hash(password)
+
+    def is_password_valid(self, password: str) -> bool:
+        return check_password_hash(self.password, password)
 
     def generate_jwt(self) -> bytes:
         payload = {
