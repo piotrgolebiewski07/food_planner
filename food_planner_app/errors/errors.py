@@ -18,15 +18,25 @@ class ErrorResponse:
         return response
 
 
+@errors_bp.app_errorhandler(400)
+def bad_request_error(err):
+    messages = err.data.get('messages', {}).get('json', {})
+    return ErrorResponse(messages, 400).to_response()
+
+
+@errors_bp.app_errorhandler(401)
+def unauthorized_error(err):
+    return ErrorResponse(err.description, 401).to_response()
+
+
 @errors_bp.app_errorhandler(404)
 def not_found_error(err):
     return ErrorResponse(err.description, 404).to_response()
 
 
-@errors_bp.app_errorhandler(400)
-def bad_request_error(err):
-    messages = err.data.get('messages', {}).get('json', {})
-    return ErrorResponse(messages, 400).to_response()
+@errors_bp.app_errorhandler(409)
+def conflict_error(err):
+    return ErrorResponse(err.description, 409).to_response()
 
 
 @errors_bp.app_errorhandler(415)
@@ -39,7 +49,3 @@ def internal_server_error(err):
     db.session.rollback()
     return ErrorResponse(err.description, 500).to_response()
 
-
-@errors_bp.app_errorhandler(409)
-def conflict_error(err):
-    return ErrorResponse(err.description, 409).to_response()
