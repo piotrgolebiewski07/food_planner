@@ -19,10 +19,12 @@ def create_app(config_class=Config):
     from food_planner_app.errors import errors_bp
     from food_planner_app.ingredients import ingredients_bp
     from food_planner_app.recipes import recipes_bp
+    from food_planner_app.auth import auth_bp
     app.register_blueprint(db_manage_bp)
     app.register_blueprint(errors_bp)
     app.register_blueprint(ingredients_bp, url_prefix='/api/v1')
     app.register_blueprint(recipes_bp, url_prefix='/api/v1')
+    app.register_blueprint(auth_bp, url_prefix='/api/v1/auth')
 
     return app
 

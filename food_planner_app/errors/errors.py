@@ -1,6 +1,7 @@
 from flask import Response, jsonify
 from food_planner_app import db
 from food_planner_app.errors import errors_bp
+from werkzeug.exceptions import HTTPException
 
 
 class ErrorResponse:
@@ -38,3 +39,7 @@ def internal_server_error(err):
     db.session.rollback()
     return ErrorResponse(err.description, 500).to_response()
 
+
+@errors_bp.app_errorhandler(409)
+def conflict_error(err):
+    return ErrorResponse(err.description, 409).to_response()
