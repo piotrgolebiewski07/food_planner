@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Pancakes",
+    "description": "Classic fluffy pancakes, perfect for breakfast.",
+    "servings": 2
+  },
+  {
+    "name": "Scrambled Eggs",
+    "description": "Simple scrambled eggs with butter.",
+    "servings": 1
+  },
+  {
+    "name": "Spaghetti Bolognese",
+    "description": "Traditional Italian pasta with meat sauce.",
+    "servings": 4
+  },
+  {
+    "name": "Chicken Salad",
+    "description": "Light salad with grilled chicken and vegetables.",
+    "servings": 2
+  },
+  {
+    "name": "Vegetable Soup",
+    "description": "Healthy homemade vegetable soup.",
+    "servings": 4
+  }
+]

@@ -2,7 +2,7 @@ from flask import jsonify
 from webargs.flaskparser import use_args
 from food_planner_app import db
 from food_planner_app.models import Ingredient, IngredientSchema, ingredient_schema
-from food_planner_app.utils import validate_json_content_type, get_schema_args, apply_order, apply_filter, get_pagination
+from food_planner_app.utils import validate_json_content_type, get_schema_args, apply_order, apply_filter, get_pagination, token_required
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from food_planner_app.ingredients import ingredients_bp
@@ -36,9 +36,10 @@ def get_ingredient(ingredient_id: int):
 
 
 @ingredients_bp.route('/ingredients', methods=['POST'])
+@token_required
 @validate_json_content_type
 @use_args(ingredient_schema, error_status_code=400)
-def create_ingredient(args: dict):
+def create_ingredient(user_id: str, args: dict):
     ingredient = Ingredient(**args)
 
     try:
@@ -58,9 +59,10 @@ def create_ingredient(args: dict):
 
 
 @ingredients_bp.route('/ingredients/<int:ingredient_id>', methods=['PUT'])
+@token_required
 @validate_json_content_type
 @use_args(IngredientSchema(partial=True),  error_status_code=400)
-def update_ingredient(args: dict, ingredient_id: int):
+def update_ingredient(user_id: str, args: dict, ingredient_id: int):
     ingredient = Ingredient.query.get_or_404(ingredient_id, description=f'Ingredient with id {ingredient_id} not found')
 
     for key, values in args.items():
@@ -75,7 +77,8 @@ def update_ingredient(args: dict, ingredient_id: int):
 
 
 @ingredients_bp.route('/ingredients/<int:ingredient_id>', methods=['DELETE'])
-def delete_ingredient(ingredient_id: int):
+@token_required
+def delete_ingredient(user_id: str, ingredient_id: int):
     ingredient = Ingredient.query.get_or_404(ingredient_id, description=f'Ingredient with id {ingredient_id} not found')
 
     db.session.delete(ingredient)

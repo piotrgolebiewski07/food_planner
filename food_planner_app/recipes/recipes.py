@@ -3,7 +3,7 @@ from webargs.flaskparser import use_args
 from food_planner_app import db
 from food_planner_app.recipes import recipes_bp
 from food_planner_app.models import Recipe, RecipeSchema, recipe_schema
-from food_planner_app.utils import validate_json_content_type, get_schema_args, apply_order, apply_filter, get_pagination
+from food_planner_app.utils import validate_json_content_type, get_schema_args, apply_order, apply_filter, get_pagination, token_required
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
@@ -36,9 +36,10 @@ def get_recipe(recipe_id: int):
 
 
 @recipes_bp.route('/recipes', methods=['POST'])
+@token_required
 @validate_json_content_type
 @use_args(recipe_schema, error_status_code=400)
-def create_recipe(args: dict):
+def create_recipe(user_id: str, args: dict):
     recipe = Recipe(**args)
 
     try:
@@ -58,9 +59,10 @@ def create_recipe(args: dict):
 
 
 @recipes_bp.route('/recipes/<int:recipe_id>', methods=['PUT'])
+@token_required
 @validate_json_content_type
-@use_args(recipe_schema, error_status_code=400)
-def update_recipe(args: dict, recipe_id: int):
+@use_args(RecipeSchema(partial=True), error_status_code=400)
+def update_recipe(user_id: str, args: dict, recipe_id: int):
     recipe = Recipe.query.get_or_404(recipe_id, description=f'Recipe with id {recipe_id} not found')
 
     for key, values in args.items():
@@ -75,7 +77,8 @@ def update_recipe(args: dict, recipe_id: int):
 
 
 @recipes_bp.route('/recipes/<int:recipe_id>', methods=['DELETE'])
-def delete_recipe(recipe_id: int):
+@token_required
+def delete_recipe(user_id: str, recipe_id: int):
     recipe = Recipe.query.get_or_404(recipe_id, description=f'Recipe with id {recipe_id} not found')
 
     db.session.delete(recipe)
