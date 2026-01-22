@@ -3,7 +3,7 @@ from webargs.flaskparser import use_args
 from food_planner_app import db
 from food_planner_app.auth import auth_bp
 from food_planner_app.models import User, user_schema, UserSchema
-from food_planner_app.utils import validate_json_content_type
+from food_planner_app.utils import validate_json_content_type, token_required
 
 
 @auth_bp.route('/register', methods=['POST'])
@@ -43,3 +43,15 @@ def login(args: dict):
         'success': True,
         'token': token
     })
+
+
+@auth_bp.route('/me', methods=['GET'])
+@token_required
+def get_current_user(user_id: str):
+    user = User.query.get_or_404(user_id, description=f'User with id {user_id} not found')
+
+    return jsonify({
+        'success': True,
+        'data': user_schema.dump(user)
+    })
+
