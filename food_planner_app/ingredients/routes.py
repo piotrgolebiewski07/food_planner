@@ -39,7 +39,7 @@ def get_ingredient(ingredient_id: int):
 @token_required
 @validate_json_content_type
 @use_args(ingredient_schema, error_status_code=400)
-def create_ingredient(user_id: str, args: dict):
+def create_ingredient(user_id: int, args: dict):
     ingredient = Ingredient(**args)
 
     try:
@@ -62,7 +62,7 @@ def create_ingredient(user_id: str, args: dict):
 @token_required
 @validate_json_content_type
 @use_args(IngredientSchema(partial=True),  error_status_code=400)
-def update_ingredient(user_id: str, args: dict, ingredient_id: int):
+def update_ingredient(user_id: int, args: dict, ingredient_id: int):
     ingredient = Ingredient.query.get_or_404(ingredient_id, description=f'Ingredient with id {ingredient_id} not found')
 
     for key, values in args.items():
@@ -78,7 +78,7 @@ def update_ingredient(user_id: str, args: dict, ingredient_id: int):
 
 @ingredients_bp.route('/ingredients/<int:ingredient_id>', methods=['DELETE'])
 @token_required
-def delete_ingredient(user_id: str, ingredient_id: int):
+def delete_ingredient(user_id: int, ingredient_id: int):
     ingredient = Ingredient.query.get_or_404(ingredient_id, description=f'Ingredient with id {ingredient_id} not found')
 
     db.session.delete(ingredient)

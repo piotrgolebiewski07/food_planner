@@ -39,7 +39,7 @@ def get_recipe(recipe_id: int):
 @token_required
 @validate_json_content_type
 @use_args(recipe_schema, error_status_code=400)
-def create_recipe(user_id: str, args: dict):
+def create_recipe(user_id: int, args: dict):
     recipe = Recipe(**args)
 
     try:
@@ -62,7 +62,7 @@ def create_recipe(user_id: str, args: dict):
 @token_required
 @validate_json_content_type
 @use_args(RecipeSchema(partial=True), error_status_code=400)
-def update_recipe(user_id: str, args: dict, recipe_id: int):
+def update_recipe(user_id: int, args: dict, recipe_id: int):
     recipe = Recipe.query.get_or_404(recipe_id, description=f'Recipe with id {recipe_id} not found')
 
     for key, values in args.items():
@@ -78,7 +78,7 @@ def update_recipe(user_id: str, args: dict, recipe_id: int):
 
 @recipes_bp.route('/recipes/<int:recipe_id>', methods=['DELETE'])
 @token_required
-def delete_recipe(user_id: str, recipe_id: int):
+def delete_recipe(user_id: int, recipe_id: int):
     recipe = Recipe.query.get_or_404(recipe_id, description=f'Recipe with id {recipe_id} not found')
 
     db.session.delete(recipe)

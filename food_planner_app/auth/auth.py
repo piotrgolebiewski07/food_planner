@@ -2,7 +2,7 @@ from flask import abort, jsonify
 from webargs.flaskparser import use_args
 from food_planner_app import db
 from food_planner_app.auth import auth_bp
-from food_planner_app.models import User, user_schema, UserSchema
+from food_planner_app.models import User, user_schema, UserSchema, user_password_update_schema
 from food_planner_app.utils import validate_json_content_type, token_required
 
 
@@ -47,8 +47,27 @@ def login(args: dict):
 
 @auth_bp.route('/me', methods=['GET'])
 @token_required
-def get_current_user(user_id: str):
+def get_current_user(user_id: int):
     user = User.query.get_or_404(user_id, description=f'User with id {user_id} not found')
+
+    return jsonify({
+        'success': True,
+        'data': user_schema.dump(user)
+    })
+
+
+@auth_bp.route('/update/password/', methods=['PUT'])
+@token_required
+@validate_json_content_type
+@use_args(user_password_update_schema, error_status_code=400)
+def update_user_password(user_id: int, args: dict):
+    user = User.query.get_or_404(user_id, description=f'User with id {user_id} not found')
+
+    if not user.is_password_valid(args['current_password']):
+        abort(401, description="Invalid password")
+
+    user.password = user.generate_hashed_password(args['new_password'])
+    db.session.commit()
 
     return jsonify({
         'success': True,
