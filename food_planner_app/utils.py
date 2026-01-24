@@ -1,7 +1,7 @@
 import jwt
 import re
 from flask import url_for, current_app, abort
-from werkzeug.exceptions import UnsupportedMediaType
+from werkzeug.exceptions import UnsupportedMediaType, BadRequest
 from functools import wraps
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.sql.expression import BinaryExpression
@@ -14,9 +14,14 @@ COMPARISON_OPERATORS_RE = re.compile(r'(.*)\[(eq|gte|gt|lte|lt|ne)\]')
 def validate_json_content_type(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        data = request.get_json()
+        try:
+            data = request.get_json(silent=True)
+        except BadRequest:
+            abort(400, description="Invalid JSON body")
+
         if data is None:
-            raise UnsupportedMediaType('Content type must be application/json')
+            abort(415,description='Content type must be application/json')
+
         return func(*args, **kwargs)
     return wrapper
 

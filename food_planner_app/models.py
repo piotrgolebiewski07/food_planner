@@ -101,7 +101,16 @@ class UserPasswordUpdateSchema(Schema):
     new_password = fields.String(required=True, load_only=True, validate=validate.Length(min=6, max=255))
 
 
+class UserUpdateSchema(Schema):
+    username = fields.String(required=False, validate=validate.Length(max=255))
+    email = fields.Email(required=False)
+
+    class Meta:
+        unknown = EXCLUDE
+
+
 ingredient_schema = IngredientSchema()
 recipe_schema = RecipeSchema()
 user_schema = UserSchema()
 user_password_update_schema = UserPasswordUpdateSchema()
+user_update_schema = UserUpdateSchema()

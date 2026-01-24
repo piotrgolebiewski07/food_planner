@@ -2,8 +2,9 @@ from flask import abort, jsonify
 from webargs.flaskparser import use_args
 from food_planner_app import db
 from food_planner_app.auth import auth_bp
-from food_planner_app.models import User, user_schema, UserSchema, user_password_update_schema
+from food_planner_app.models import User, user_schema, UserSchema, user_password_update_schema, user_update_schema
 from food_planner_app.utils import validate_json_content_type, token_required
+from sqlalchemy.exc import IntegrityError
 
 
 @auth_bp.route('/register', methods=['POST'])
@@ -73,4 +74,37 @@ def update_user_password(user_id: int, args: dict):
         'success': True,
         'data': user_schema.dump(user)
     })
+
+
+@auth_bp.route('/update/data/', methods=['PATCH'])
+@token_required
+@validate_json_content_type
+@use_args(user_update_schema, error_status_code=400)
+def update_user_data(user_id: int, args: dict):
+
+    if not isinstance(args, dict):
+        abort(400, description="Invalid JSON body")
+
+    if not args:
+        abort(400, description="No data provided for update")
+
+    user = User.query.get_or_404(user_id, description=f'User with id {user_id} not found')
+
+    if 'username' in args:
+        user.username = args['username']
+    if 'email' in args:
+        user.email = args['email']
+
+
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        abort(409, description="Username or email already in use")
+
+    return jsonify({
+        'success': True,
+        'data': user_schema.dump(user)
+    }), 200
+
 

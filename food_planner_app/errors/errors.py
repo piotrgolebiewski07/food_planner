@@ -20,7 +20,11 @@ class ErrorResponse:
 
 @errors_bp.app_errorhandler(400)
 def bad_request_error(err):
-    messages = err.data.get('messages', {}).get('json', {})
+    if hasattr(err, "data") and err.data:
+        messages = err.data.get('messages', {}).get('json', {})
+    else:
+        messages = err.description or "Bad request"
+
     return ErrorResponse(messages, 400).to_response()
 
 
