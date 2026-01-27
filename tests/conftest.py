@@ -1,10 +1,11 @@
 import pytest
 from food_planner_app import create_app, db
+from config import TestingConfig
 
 
 @pytest.fixture
 def app():
-    app = create_app('testing')
+    app = create_app(TestingConfig)
 
     with app.app_context():
         db.create_all()
@@ -15,11 +16,32 @@ def app():
         db.session.remove()
         db.engine.dispose()
 
-    app.config['DB_FILE_PATH'].unlink(missing_ok=True)
-
 
 @pytest.fixture
 def client(app):
     with app.test_client() as client:
         yield client
         
+
+@pytest.fixture
+def user(client):
+    user = {
+        "username": "test",
+        "password": "123456",
+        "email": "test@gmail.com"
+    }
+    client.post("/api/v1/auth/register", json=user)
+    return user
+
+
+@pytest.fixture
+def token(client, user):
+    response = client.post('/api/v1/auth/login', json={
+        'username': user['username'],
+        'password': user['password']
+    })
+    return response.get_json()['token']
+
+
+
+
