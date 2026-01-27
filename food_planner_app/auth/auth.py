@@ -27,7 +27,7 @@ def register(args: dict):
     return jsonify({
         'success': True,
         'token': token
-    })
+    }), 201
 
 
 @auth_bp.route('/login', methods=['POST'])
@@ -49,7 +49,9 @@ def login(args: dict):
 @auth_bp.route('/me', methods=['GET'])
 @token_required
 def get_current_user(user_id: int):
-    user = User.query.get_or_404(user_id, description=f'User with id {user_id} not found')
+    user = db.session.get(User, user_id)
+    if not user:
+        abort(404, description=f'User with id {user_id} not found')
 
     return jsonify({
         'success': True,
@@ -62,7 +64,9 @@ def get_current_user(user_id: int):
 @validate_json_content_type
 @use_args(user_password_update_schema, error_status_code=400)
 def update_user_password(user_id: int, args: dict):
-    user = User.query.get_or_404(user_id, description=f'User with id {user_id} not found')
+    user = db.Session.get(User, user_id)
+    if not user:
+        abort(404, description=f'User with id {user_id} not found')
 
     if not user.is_password_valid(args['current_password']):
         abort(401, description="Invalid password")
@@ -88,13 +92,14 @@ def update_user_data(user_id: int, args: dict):
     if not args:
         abort(400, description="No data provided for update")
 
-    user = User.query.get_or_404(user_id, description=f'User with id {user_id} not found')
+    user = db.session.get(User, user_id)
+    if not user:
+        abort(404, description=f'User with id {user_id} not found')
 
     if 'username' in args:
         user.username = args['username']
     if 'email' in args:
         user.email = args['email']
-
 
     try:
         db.session.commit()

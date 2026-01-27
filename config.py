@@ -14,3 +14,9 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     PER_PAGE = 5
     JWT_EXPIRED_MINUTES = 30
+
+
+class TestingConfig(Config):
+    TESTING = True
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
