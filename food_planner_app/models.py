@@ -1,6 +1,6 @@
 import jwt
 from flask import current_app
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from food_planner_app import db
 from marshmallow import Schema, fields, validate, EXCLUDE
 from decimal import Decimal
@@ -40,7 +40,7 @@ class User(db.Model):
     username = db.Column(db.String(255), nullable=False, unique=True, index=True)
     email = db.Column(db.String(255), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
-    creation_date = db.Column(db.DateTime, default=datetime.utcnow)
+    creation_date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     @staticmethod
     def generate_hashed_password(password: str) -> str:
@@ -52,7 +52,7 @@ class User(db.Model):
     def generate_jwt(self) -> bytes:
         payload = {
             'user_id': self.id,
-            'exp': datetime.utcnow() + timedelta(minutes=current_app.config.get('JWT_EXPIRED_MINUTES', 30))
+            'exp': datetime.now(timezone.utc) + timedelta(minutes=current_app.config.get('JWT_EXPIRED_MINUTES', 30))
         }
         return jwt.encode(payload, current_app.config.get('SECRET_KEY'))
 
