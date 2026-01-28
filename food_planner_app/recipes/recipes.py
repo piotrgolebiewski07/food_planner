@@ -21,7 +21,7 @@ def get_recipes():
     return jsonify({
         'success': True,
         'data': recipes,
-        'records on page': len(recipes),
+        'user_id: int on page': len(recipes),
         'pagination': pagination
     })
 
