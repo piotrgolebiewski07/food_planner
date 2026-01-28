@@ -1,4 +1,4 @@
-from flask import jsonify
+from flask import jsonify, abort
 from webargs.flaskparser import use_args
 from food_planner_app import db
 from food_planner_app.models import Ingredient, IngredientSchema, ingredient_schema
@@ -6,7 +6,6 @@ from food_planner_app.utils import validate_json_content_type, get_schema_args, 
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from food_planner_app.ingredients import ingredients_bp
-
 
 
 @ingredients_bp.route('/ingredients', methods=['GET'])
@@ -21,14 +20,16 @@ def get_ingredients():
     return jsonify({
         'success': True,
         'data': ingredients,
-        'records on page': len(ingredients),
+        'records_on_page': len(ingredients),
         'pagination': pagination
     })
 
 
 @ingredients_bp.route('/ingredients/<int:ingredient_id>', methods=['GET'])
 def get_ingredient(ingredient_id: int):
-    ingredient = Ingredient.query.get_or_404(ingredient_id, description=f'Ingredient with id {ingredient_id} not found')
+    ingredient = db.session.get(Ingredient, ingredient_id)
+    if not ingredient:
+        abort(404, description=f'Ingredient with id {ingredient_id} not found')
     return jsonify({
         'success': True,
         'data': ingredient_schema.dump(ingredient)
