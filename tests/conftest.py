@@ -1,7 +1,7 @@
 import pytest
 from food_planner_app import create_app, db
 from config import TestingConfig
-
+from food_planner_app.commands.db_manage_commands import add_data
 
 @pytest.fixture
 def app():
@@ -43,5 +43,8 @@ def token(client, user):
     return response.get_json()['token']
 
 
-
+@pytest.fixture
+def sample_data(app):
+    runner = app.test_cli_runner()
+    runner.invoke(add_data)
 
