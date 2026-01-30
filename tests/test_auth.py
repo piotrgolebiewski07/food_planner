@@ -4,7 +4,7 @@ import pytest
 def test_registration(client):
     response = client.post('/api/v1/auth/register',
                            json={
-                               'username':  'test',
+                               'username': 'test',
                                'password': '123456',
                                'email': 'test@gmail.com'
                            })
@@ -79,9 +79,9 @@ def test_registration_already_used_email(client, user):
 
 def test_get_current_user(client, user, token):
     response = client.get('/api/v1/auth/me',
-                           headers={
-                               'Authorization': f'Bearer {token}'
-                           })
+                          headers={
+                              'Authorization': f'Bearer {token}'
+                          })
     response_data = response.get_json()
     assert response.status_code == 200
     assert response.headers['Content-Type'] == 'application/json'
@@ -98,6 +98,51 @@ def test_get_current_user_missing_token(client):
     assert response.status_code == 401
     assert response.headers['Content-Type'] == 'application/json'
     assert response_data['success'] is False
-    assert 'data'not in response_data
+    assert 'data' not in response_data
 
 
+@pytest.mark.parametrize(
+    'data, missing_field',
+    [
+        ({'name': 'milk', 'calories': 40}, 'unit'),
+        ({'calories': 40, 'unit': 'ml'}, 'name'),
+        ({'name': 'milk', 'unit': 'ml'}, 'calories')
+    ]
+)
+def test_create_ingredient_invalid_data(client, token, data, missing_field):
+    response = client.post('/api/v1/ingredients',
+                           json=data,
+                           headers={
+                               'Authorization': f'Bearer {token}'
+                           })
+    response_data = response.get_json()
+    assert response.status_code == 400
+    assert response.headers['Content-Type'] == 'application/json'
+    assert response_data['success'] is False
+    assert 'data' not in response_data
+    assert missing_field in response_data['message']
+    assert 'Missing data for required field.' in response_data['message'][missing_field]
+    assert isinstance(response_data['message'][missing_field], list)
+
+
+def test_create_ingredient_invalid_content_type(client, token, ingredient):
+    response = client.post('/api/v1/ingredients',
+                           data=ingredient,
+                           headers={
+                               'Authorization': f'Bearer {token}'
+                           })
+    response_data = response.get_json()
+    assert response.status_code == 415
+    assert response.headers['Content-Type'] == 'application/json'
+    assert response_data['success'] is False
+    assert 'data' not in response_data
+
+
+def test_create_ingredient_missing_token(client, ingredient):
+    response = client.post('/api/v1/ingredients',
+                           json=ingredient)
+    response_data = response.get_json()
+    assert response.status_code == 401
+    assert response.headers['Content-Type'] == 'application/json'
+    assert response_data['success'] is False
+    assert 'data' not in response_data

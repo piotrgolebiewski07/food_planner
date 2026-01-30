@@ -69,3 +69,32 @@ def test_get_single_ingredient_not_found(client, sample_data):
     assert response.headers['Content-Type'] == 'application/json'
     assert response_data['success'] is False
     assert 'data' not in response_data
+
+
+def test_create_ingredient(client, token, ingredient):
+    response = client.post('/api/v1/ingredients',
+                           json=ingredient,
+                           headers={
+                               'Authorization': f'Bearer {token}'
+                           })
+    response_data = response.get_json()
+
+    assert response.status_code == 201
+    assert response.headers['Content-Type'] == 'application/json'
+    assert response_data['success'] is True
+
+    created = response_data['data']
+
+    assert created['name'] == ingredient['name']
+    assert created['unit'] == ingredient['unit']
+    assert created['calories'] == '40.00'
+    assert 'id' in created
+
+    ingredient_id = created['id']
+
+    response = client.get(f'/api/v1/ingredients/{ingredient_id}')
+    response_data = response.get_json()
+    assert response.status_code == 200
+    assert response_data['success'] is True
+    assert response_data['data']['name'] == ingredient['name']
+

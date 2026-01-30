@@ -3,6 +3,7 @@ from food_planner_app import create_app, db
 from config import TestingConfig
 from food_planner_app.commands.db_manage_commands import add_data
 
+
 @pytest.fixture
 def app():
     app = create_app(TestingConfig)
@@ -47,4 +48,13 @@ def token(client, user):
 def sample_data(app):
     runner = app.test_cli_runner()
     runner.invoke(add_data)
+
+
+@pytest.fixture
+def ingredient():
+    return {
+        'name': 'milk',
+        'calories': 40,
+        'unit': 'ml'
+    }
 
