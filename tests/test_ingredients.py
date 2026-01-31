@@ -166,3 +166,43 @@ def test_create_ingredient_duplicate_name(client, token, ingredient):
     assert response.status_code == 409
 
 
+def test_delete_ingredient_success(client, token, ingredient):
+    response = client.post('/api/v1/ingredients',
+                           json=ingredient,
+                           headers={
+                               'Authorization': f'Bearer {token}'
+                           })
+    assert response.status_code == 201
+    ingredient_id = response.get_json()['data']['id']
+
+    response = client.delete(
+        f'/api/v1/ingredients/{ingredient_id}',
+        headers={'Authorization': f'Bearer {token}'}
+    )
+    assert response.status_code == 200
+
+    response = client.get(f'/api/v1/ingredients/{ingredient_id}')
+    assert response.status_code == 404
+
+
+def test_delete_ingredient_missing_token(client, ingredient, token):
+    response = client.post('/api/v1/ingredients',
+                           json=ingredient,
+                           headers={
+                               'Authorization': f'Bearer {token}'
+                           })
+    assert response.status_code == 201
+    ingredient_id = response.get_json()['data']['id']
+
+    response = client.delete(
+        f'/api/v1/ingredients/{ingredient_id}')
+    assert response.status_code == 401
+
+
+def test_delete_ingredient_not_found(client, token):
+    response = client.delete('/api/v1/ingredients/1000',
+                          headers={
+                              'Authorization': f'Bearer {token}'
+                          })
+    assert response.status_code == 404
+
