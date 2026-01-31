@@ -1,3 +1,6 @@
+import pytest
+
+
 def test_get_ingredients_no_records(client):
     response = client.get('/api/v1/ingredients')
     expected_result = {
@@ -97,4 +100,69 @@ def test_create_ingredient(client, token, ingredient):
     assert response.status_code == 200
     assert response_data['success'] is True
     assert response_data['data']['name'] == ingredient['name']
+
+
+@pytest.mark.parametrize(
+    'data, missing_field',
+    [
+        ({'name': 'milk', 'calories': 40}, 'unit'),
+        ({'calories': 40, 'unit': 'ml'}, 'name'),
+        ({'name': 'milk', 'unit': 'ml'}, 'calories')
+    ]
+)
+def test_create_ingredient_invalid_data(client, token, data, missing_field):
+    response = client.post('/api/v1/ingredients',
+                           json=data,
+                           headers={
+                               'Authorization': f'Bearer {token}'
+                           })
+    response_data = response.get_json()
+    assert response.status_code == 400
+    assert response.headers['Content-Type'] == 'application/json'
+    assert response_data['success'] is False
+    assert 'data' not in response_data
+    assert missing_field in response_data['message']
+    assert 'Missing data for required field.' in response_data['message'][missing_field]
+    assert isinstance(response_data['message'][missing_field], list)
+
+
+def test_create_ingredient_invalid_content_type(client, token, ingredient):
+    response = client.post('/api/v1/ingredients',
+                           data=ingredient,
+                           headers={
+                               'Authorization': f'Bearer {token}'
+                           })
+    response_data = response.get_json()
+    assert response.status_code == 415
+    assert response.headers['Content-Type'] == 'application/json'
+    assert response_data['success'] is False
+    assert 'data' not in response_data
+
+
+def test_create_ingredient_missing_token(client, ingredient):
+    response = client.post('/api/v1/ingredients',
+                           json=ingredient)
+    response_data = response.get_json()
+    assert response.status_code == 401
+    assert response.headers['Content-Type'] == 'application/json'
+    assert response_data['success'] is False
+    assert 'data' not in response_data
+
+
+def test_create_ingredient_duplicate_name(client, token, ingredient):
+    response = client.post('/api/v1/ingredients',
+                           json=ingredient,
+                           headers={
+                               'Authorization': f'Bearer {token}'
+                           })
+    assert response.status_code == 201
+
+    response = client.post('/api/v1/ingredients',
+                           json=ingredient,
+                           headers={
+                               'Authorization': f'Bearer {token}'
+                           })
+
+    assert response.status_code == 409
+
 
