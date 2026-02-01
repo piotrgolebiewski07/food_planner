@@ -1,11 +1,16 @@
 # Food Planner API
 
-Food Planner API is a lightweight REST backend built with **Flask** and **Flask-SQLAlchemy**.
-It serves as a foundation for a future meal-planning system that will manage ingredients,
-recipes, and meal schedules.
+Food Planner API is a RESTful backend built with **Flask** and **Flask-SQLAlchemy**, focused on
+API design, automated testing, and clean backend architecture.
 
-The current version focuses on core backend architecture and database integration and is
-designed as a learning and portfolio-oriented backend project.
+## Key Highlights
+
+- Fully tested REST API (pytest, integration tests)
+- Clear separation of concerns (auth, ingredients)
+- CRUD operations with validation and error handling
+- Token-based authentication (JWT)
+- Pagination, filtering, sorting, and field selection
+- Clean Git workflow (feature branches, atomic commits)
 
 ## Features
 
@@ -18,6 +23,21 @@ designed as a learning and portfolio-oriented backend project.
 - Easily extendable for future modules (recipes, meals, planner)
 - Flexible query filtering and sorting for API resources
 
+### Authentication
+- User registration
+- Login with JWT
+- Auth-protected endpoints
+- Validation and error handling
+
+### Ingredients (CRUD)
+- GET ingredients list (pagination, filters, sorting)
+- GET single ingredient
+- CREATE ingredient (auth required)
+- DELETE ingredient (auth required)
+- Validation and duplicate protection
+
+All endpoints are covered by **integration tests**.
+
 ## Tech Stack
 
 - Python
@@ -25,21 +45,34 @@ designed as a learning and portfolio-oriented backend project.
 - Flask-SQLAlchemy
 - MySQL
 - Alembic
-
+- pytest
+  
 ## Project Structure
 
 ```
 food_planner_app/
-├── __init__.py
+├── auth/
+├── ingredients/
 ├── models.py
-├── ingredients.py
-├── db_manage_commands.py
-├── samples/
-│   └── ingredients.json
-migrations/
+├── utils.py
+├── commands/
+tests/
+├── test_auth.py
+├── test_ingredients.py
+├── conftest.py
 config.py
-food_planner.py
 ```
+## Testing
+
+The project includes a comprehensive pytest suite:
+- Authentication tests
+- Ingredients CRUD tests
+- Validation and error scenarios
+- Authorization checks
+  
+Tests are written as integration tests using Flask test client,
+focusing on API behavior rather than implementation details.
+
 ## Setup (Local)
 
 1. Create a virtual environment
@@ -50,8 +83,9 @@ food_planner.py
 
 ## Current Scope
 
-- Ingredient model
-- Sample data loading via CLI commands
+- Authentication with JWT
+- Ingredients CRUD with validation and pagination
+- Integration tests covering API behavior
 - Database schema managed with migrations
 
 ## Future Plans
@@ -75,3 +109,13 @@ Examples:
 - GET /api/v1/ingredients?calories[gte]=100
 - GET /api/v1/ingredients?unit[ne]=g
 - GET /api/v1/ingredients?fields=name,calories&sort=-calories
+
+## Quick Start
+
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux / macOS
+venv\Scripts\activate   # Windows
+pip install -r requirements.txt
+flask db upgrade
+flask run
