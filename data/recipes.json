@@ -2,26 +2,73 @@
   {
     "name": "Pancakes",
     "description": "Classic fluffy pancakes, perfect for breakfast.",
-    "servings": 2
+    "servings": 2,
+    "ingredients": [
+      { "name": "flour wheat", "amount": 120 },
+      { "name": "milk", "amount": 200 },
+      { "name": "egg", "amount": 2 }
+    ]
   },
   {
     "name": "Scrambled Eggs",
     "description": "Simple scrambled eggs with butter.",
-    "servings": 1
+    "servings": 1,
+    "ingredients": [
+      { "name": "egg", "amount": 2 },
+      { "name": "milk", "amount": 50 }
+    ]
   },
   {
-    "name": "Spaghetti Bolognese",
+    "name": "Spaghetti with Tomato Sauce",
     "description": "Traditional Italian pasta with meat sauce.",
-    "servings": 4
+    "servings": 4,
+    "ingredients": [
+      { "name": "pasta", "amount": 400 },
+      { "name": "tomato", "amount": 300 },
+      { "name": "onion", "amount": 100 },
+      { "name": "garlic", "amount": 10 }
+    ]
   },
   {
     "name": "Chicken Salad",
     "description": "Light salad with grilled chicken and vegetables.",
-    "servings": 2
+    "servings": 2,
+    "ingredients": [
+      { "name": "chicken breast", "amount": 300 },
+      { "name": "tomato", "amount": 150 },
+      { "name": "spinach", "amount": 100 }
+    ]
   },
   {
     "name": "Vegetable Soup",
     "description": "Healthy homemade vegetable soup.",
-    "servings": 4
+    "servings": 4,
+    "ingredients": [
+      { "name": "carrot", "amount": 200 },
+      { "name": "potatoes", "amount": 300 },
+      { "name": "onion", "amount": 100 },
+      { "name": "garlic", "amount": 10 }
+    ]
+  },
+  {
+    "name": "Lentil Stew",
+    "description": "Hearty lentil-based stew.",
+    "servings": 4,
+    "ingredients": [
+      { "name": "lentils", "amount": 250 },
+      { "name": "carrot", "amount": 150 },
+      { "name": "onion", "amount": 100 },
+      { "name": "garlic", "amount": 10 }
+    ]
+  },
+  {
+    "name": "Salmon with Potatoes",
+    "description": "Baked salmon served with potatoes.",
+    "servings": 2,
+    "ingredients": [
+      { "name": "salmon", "amount": 300 },
+      { "name": "potatoes", "amount": 300 },
+      { "name": "olive oil", "amount": 20 }
+    ]
   }
 ]

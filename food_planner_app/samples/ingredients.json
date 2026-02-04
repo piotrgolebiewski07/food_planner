@@ -15,16 +15,6 @@
     "unit": "ml"
   },
   {
-    "name": "buttermilk",
-    "calories": 40,
-    "unit": "ml"
-  },
-  {
-    "name": "kefir",
-    "calories": 41,
-    "unit": "ml"
-  },
-  {
     "name": "yogurt natural",
     "calories": 59,
     "unit": "g"
@@ -32,6 +22,91 @@
   {
     "name": "egg",
     "calories": 155,
+    "unit": "g"
+  },
+  {
+    "name": "chicken breast",
+    "calories": 165,
+    "unit": "g"
+  },
+  {
+    "name": "salmon",
+    "calories": 208,
+    "unit": "g"
+  },
+  {
+    "name": "rice",
+    "calories": 130,
+    "unit": "g"
+  },
+  {
+    "name": "pasta",
+    "calories": 131,
+    "unit": "g"
+  },
+  {
+    "name": "potatoes",
+    "calories": 77,
+    "unit": "g"
+  },
+  {
+    "name": "olive oil",
+    "calories": 884,
+    "unit": "ml"
+  },
+  {
+    "name": "onion",
+    "calories": 40,
+    "unit": "g"
+  },
+  {
+    "name": "garlic",
+    "calories": 149,
+    "unit": "g"
+  },
+  {
+    "name": "tomato",
+    "calories": 18,
+    "unit": "g"
+  },
+  {
+    "name": "spinach",
+    "calories": 23,
+    "unit": "g"
+  },
+  {
+    "name": "mushroom",
+    "calories": 22,
+    "unit": "g"
+  },
+  {
+    "name": "lentils",
+    "calories": 116,
+    "unit": "g"
+  },
+  {
+    "name": "chickpeas",
+    "calories": 164,
+    "unit": "g"
+  },
+  {
+    "name": "cheese",
+    "calories": 402,
+    "unit": "g"
+  },
+  {
+    "name": "bread",
+    "calories": 265,
+    "unit": "g"
+  },
+  {
+    "name": "zucchini",
+    "calories": 17,
+    "unit": "g"
+  },
+  {
+    "name": "carrot",
+    "calories": 41,
     "unit": "g"
   }
 ]
