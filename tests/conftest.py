@@ -2,7 +2,7 @@ import pytest
 from food_planner_app import create_app, db
 from config import TestingConfig
 from food_planner_app.commands.db_manage_commands import add_data
-
+from food_planner_app.models import Ingredient
 
 @pytest.fixture
 def app():
@@ -46,8 +46,20 @@ def token(client, user):
 
 @pytest.fixture
 def sample_data(app):
-    runner = app.test_cli_runner()
-    runner.invoke(add_data)
+    from food_planner_app.models import Ingredient
+    from food_planner_app import db
+
+    with app.app_context():
+        db.session.add_all([
+            Ingredient(name="water", calories=0, unit="ml"),
+            Ingredient(name="milk", calories=42, unit="ml"),
+            Ingredient(name="flour", calories=364, unit="g"),
+            Ingredient(name="eggs", calories=155, unit="g"),
+            Ingredient(name="salt", calories=0, unit="g"),
+            Ingredient(name="sugar", calories=387, unit="g"),
+            Ingredient(name="butter", calories=717, unit="g"),
+        ])
+        db.session.commit()
 
 
 @pytest.fixture

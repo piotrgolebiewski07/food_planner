@@ -12,11 +12,14 @@ class Ingredient(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False, unique=True)
-    calories = db.Column(db.Numeric(6,2), nullable=False)  # kcal per 100g or 1 pc
-    unit = db.Column(db.String(10), nullable=False, default="g")    # g/ml/pcs
+    calories = db.Column(db.Numeric(6,2), nullable=False)
+    unit = db.Column(db.String(10), nullable=False, default="g")
 
-    def __repr__(self):
-        return f"<Ingredient {self.name}>"
+    recipes = db.relationship(
+        "RecipeIngredient",
+        back_populates="ingredient",
+        cascade="all, delete-orphan"
+    )
 
 
 class Recipe(db.Model):
@@ -65,7 +68,7 @@ class RecipeIngredient(db.Model):
     amount = db.Column(db.Numeric(6,2), nullable=False)
 
     recipe = db.relationship("Recipe", back_populates="ingredients")
-    ingredient = db.relationship("Ingredient")
+    ingredient = db.relationship("Ingredient", back_populates="recipes")
 
 
 class IngredientSchema(Schema):
