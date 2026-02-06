@@ -1,11 +1,10 @@
 from flask import request, abort
 from flask import jsonify
-from webargs.flaskparser import use_args
 from food_planner_app import db
 from food_planner_app.recipes import recipes_bp
-from food_planner_app.models import Recipe, RecipeIngredient, Ingredient, RecipeSchema, recipe_schema
-from food_planner_app.utils import validate_json_content_type, get_schema_args, apply_order, apply_filter, get_pagination, token_required
-from sqlalchemy import select
+from food_planner_app.models import Recipe, RecipeIngredient, Ingredient
+from food_planner_app.utils import validate_json_content_type, get_pagination, token_required
+from sqlalchemy import select, func
 from sqlalchemy.exc import IntegrityError
 
 
@@ -66,6 +65,33 @@ def get_recipe(recipe_id: int):
         "data": data
     })
 
+
+@recipes_bp.route('/recipes/random', methods=['GET'])
+def random_recipes():
+    days = min(int(request.args.get("days", 7)), 14)
+
+
+    recipes = (
+        db.session.query(Recipe)
+        .order_by(func.random())
+        .limit(days)
+        .all()
+    )
+
+    data = [
+        {
+            "id": r.id,
+            "name": r.name,
+            "servings": r.servings
+        }
+        for r in recipes
+    ]
+
+    return jsonify({
+        "success": True,
+        "days": days,
+        "data": data
+    })
 
 
 @recipes_bp.route('/recipes', methods=['POST'])
