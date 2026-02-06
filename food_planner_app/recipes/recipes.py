@@ -70,7 +70,6 @@ def get_recipe(recipe_id: int):
 def random_recipes():
     days = min(int(request.args.get("days", 7)), 14)
 
-
     recipes = (
         db.session.query(Recipe)
         .order_by(func.random())
@@ -130,6 +129,7 @@ def create_recipe(user_id: int):
             "name": recipe.name
         }
     }), 201
+
 
 @recipes_bp.route('/recipes/<int:recipe_id>', methods=['PUT'])
 @token_required
