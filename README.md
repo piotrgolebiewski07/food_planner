@@ -1,43 +1,44 @@
 # Food Planner API
 
-Food Planner API is a RESTful backend built with **Flask** and **Flask-SQLAlchemy**, focused on
-API design, automated testing, and clean backend architecture.
+Food Planner API is a RESTful backend built with **Flask** and **SQLAlchemy**.
+The project focuses on clean API design, relational data modeling, and
+production-ready backend architecture.
+
+It is intentionally backend-only and framework-focused.
 
 ## Key Highlights
 
-- Fully tested REST API (pytest, integration tests)
-- Clear separation of concerns (auth, ingredients)
-- CRUD operations with validation and error handling
+- REST API with full CRUD functionality
+- Many-to-many relationships with additional domain data
 - Token-based authentication (JWT)
 - Pagination, filtering, sorting, and field selection
-- Clean Git workflow (feature branches, atomic commits)
+- Integration tests using pytest
+- Clean Git workflow with feature branches
 
 ## Features
 
-- Clean and simple REST API structure using Flask
-- MySQL database integration with SQLAlchemy
-- Database migrations with Alembic
-- Environment-based configuration (`.env`)
-- Modular application design
-- CLI commands for database seeding
-- Easily extendable for future modules (recipes, meals, planner)
-- Flexible query filtering and sorting for API resources
-
 ### Authentication
-- User registration
-- Login with JWT
-- Auth-protected endpoints
+- User registration and login
+- JWT-based authentication
+- Protected endpoints
 - Validation and error handling
 
 ### Ingredients (CRUD)
-- GET ingredients list (pagination, filters, sorting)
-- GET single ingredient
-- CREATE ingredient (auth required)
-- DELETE ingredient (auth required)
-- Validation and duplicate protection
+- List ingredients (pagination, filters, sorting)
+- Retrieve single ingredient
+- Create, update and delete ingredients
+- Duplicate protection and validation
 
-All endpoints are covered by **integration tests**.
+### Recipes (CRUD)
+- Many-to-many relationship with ingredients
+- Additional domain field (`amount`) stored in join table
+- Create, read, update and delete recipes
+- Random recipe selection endpoint
 
+Example:
+```
+GET /api/v1/recipes/random?days=7
+```
 ## Tech Stack
 
 - Python
@@ -53,69 +54,60 @@ All endpoints are covered by **integration tests**.
 food_planner_app/
 ├── auth/
 ├── ingredients/
+├── recipes/
 ├── models.py
 ├── utils.py
-├── commands/
 tests/
 ├── test_auth.py
 ├── test_ingredients.py
 ├── conftest.py
+migrations/
 config.py
+seed.py
+README.md
 ```
 ## Testing
 
-The project includes a comprehensive pytest suite:
-- Authentication tests
-- Ingredients CRUD tests
-- Validation and error scenarios
-- Authorization checks
-  
-Tests are written as integration tests using Flask test client,
-focusing on API behavior rather than implementation details.
+The project includes integration tests covering:
+- Authentication flows
+- Ingredients CRUD
+- Validation and authorization rules
+
+Tests are written using Flask test client and focus on API behavior.
 
 ## Setup (Local)
 
 1. Create a virtual environment
 2. Install dependencies
-3. Create a .env file based on .env.example
+3. Create a `.env` file based on `.env.example`
 4. Run database migrations
 5. Start the application
+```
+pip install -r requirements.txt
+flask db upgrade
+flask run
+```
+## Design Notes
 
-## Current Scope
+- The project uses explicit domain modeling rather than generic schemas
+- Recipes and ingredients are connected via a join table with domain data
+- Serialization is handled manually where relationships are complex
+- The code prioritizes readability and maintainability over abstraction
 
-- Authentication with JWT
-- Ingredients CRUD with validation and pagination
-- Integration tests covering API behavior
-- Database schema managed with migrations
+---
 
-## Future Plans
+## Project Status
 
-- Recipes and meals domain models
-- Meal planning and scheduling
-- Calorie calculations and data analysis (Pandas / ML)
-- Recommendation logic based on user data
+**Finished**
 
-## Notes
-
-This project is intentionally kept lightweight and readable.
-It is intended as a foundation for further backend and data-oriented development.
+This project is considered complete and serves as a reference backend
+application demonstrating Flask, relational modeling and API design.
 
 ## Query examples
 
 The API supports basic filtering, sorting and field selection via query parameters.
 
 Examples:
-
-- GET /api/v1/ingredients?calories[gte]=100
-- GET /api/v1/ingredients?unit[ne]=g
-- GET /api/v1/ingredients?fields=name,calories&sort=-calories
-
-## Quick Start
-
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux / macOS
-venv\Scripts\activate   # Windows
-pip install -r requirements.txt
-flask db upgrade
-flask run
+- `GET /api/v1/ingredients?calories[gte]=100`
+- `GET /api/v1/ingredients?unit[ne]=g`
+- `GET /api/v1/ingredients?fields=name,calories&sort=-calories`
