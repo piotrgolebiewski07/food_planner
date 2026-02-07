@@ -1,9 +1,9 @@
-import json
 from pathlib import Path
+import json
 
 from food_planner_app import create_app, db
 from food_planner_app.models import Ingredient, Recipe, RecipeIngredient
-from sqlalchemy import text
+
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
@@ -50,7 +50,6 @@ with app.app_context():
     print("RECIPES COUNT IN FILE:", len(recipes))
 
     for item in recipes:
-        # pomiń, jeśli już istnieje
         if Recipe.query.filter_by(name=item["name"]).first():
             continue
 
@@ -60,7 +59,7 @@ with app.app_context():
             servings=item.get("servings", 1),
         )
         db.session.add(recipe)
-        db.session.flush()  # mamy recipe.id
+        db.session.flush()
 
         for ing in item.get("ingredients", []):
             ingredient = Ingredient.query.filter_by(name=ing["name"]).first()
@@ -79,3 +78,4 @@ with app.app_context():
     print("Recipes seeded.")
 
 print("Ingredients seeded.")
+

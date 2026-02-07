@@ -200,9 +200,12 @@ def test_delete_ingredient_missing_token(client, ingredient, token):
 
 
 def test_delete_ingredient_not_found(client, token):
-    response = client.delete('/api/v1/ingredients/1000',
-                          headers={
-                              'Authorization': f'Bearer {token}'
-                          })
+    response = client.delete(
+        '/api/v1/ingredients/1000',
+        headers={'Authorization': f'Bearer {token}'}
+    )
+    response_data = response.get_json()
+
     assert response.status_code == 404
+    assert response_data["success"] is False
 

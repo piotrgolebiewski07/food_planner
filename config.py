@@ -1,6 +1,7 @@
 import os
-from dotenv import load_dotenv
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 
 base_dir = Path(__file__).resolve().parent
@@ -20,3 +21,4 @@ class TestingConfig(Config):
     TESTING = True
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+

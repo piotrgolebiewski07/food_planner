@@ -1,9 +1,11 @@
 import json
 from pathlib import Path
-from food_planner_app import db
-from food_planner_app.models import Ingredient, Recipe
+
 from sqlalchemy import text
+
+from food_planner_app import db
 from food_planner_app.commands import db_manage_bp
+from food_planner_app.models import Ingredient, Recipe
 
 
 def load_json_data(file_name: str) -> list:

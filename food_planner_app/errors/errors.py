@@ -1,7 +1,7 @@
 from flask import Response, jsonify
+
 from food_planner_app import db
 from food_planner_app.errors import errors_bp
-from werkzeug.exceptions import HTTPException
 
 
 class ErrorResponse:

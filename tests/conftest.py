@@ -1,8 +1,8 @@
 import pytest
-from food_planner_app import create_app, db
+
 from config import TestingConfig
-from food_planner_app.commands.db_manage_commands import add_data
-from food_planner_app.models import Ingredient
+from food_planner_app import create_app, db
+
 
 @pytest.fixture
 def app():

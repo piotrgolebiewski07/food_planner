@@ -9,6 +9,13 @@ venv/
 __pycache__/
 *.pyc
 
+# pytest
+.pytest_cache/
+
 # IDE
 .vscode/
 .idea/
+
+# OS
+.DS_Store
+

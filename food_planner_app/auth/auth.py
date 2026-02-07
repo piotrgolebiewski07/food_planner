@@ -1,10 +1,17 @@
 from flask import abort, jsonify
+from sqlalchemy.exc import IntegrityError
 from webargs.flaskparser import use_args
+
 from food_planner_app import db
 from food_planner_app.auth import auth_bp
-from food_planner_app.models import User, user_schema, UserSchema, user_password_update_schema, user_update_schema
-from food_planner_app.utils import validate_json_content_type, token_required
-from sqlalchemy.exc import IntegrityError
+from food_planner_app.models import (
+    User,
+    UserSchema,
+    user_password_update_schema,
+    user_schema,
+    user_update_schema,
+)
+from food_planner_app.utils import token_required, validate_json_content_type
 
 
 @auth_bp.route('/register', methods=['POST'])
@@ -111,5 +118,4 @@ def update_user_data(user_id: int, args: dict):
         'success': True,
         'data': user_schema.dump(user)
     }), 200
-
 

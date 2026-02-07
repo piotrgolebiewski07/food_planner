@@ -1,11 +1,19 @@
-from flask import jsonify, abort
-from webargs.flaskparser import use_args
-from food_planner_app import db
-from food_planner_app.models import Ingredient, IngredientSchema, ingredient_schema
-from food_planner_app.utils import validate_json_content_type, get_schema_args, apply_order, apply_filter, get_pagination, token_required
+from flask import abort, jsonify
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+from webargs.flaskparser import use_args
+
+from food_planner_app import db
 from food_planner_app.ingredients import ingredients_bp
+from food_planner_app.models import Ingredient, IngredientSchema, ingredient_schema
+from food_planner_app.utils import (
+    apply_filter,
+    apply_order,
+    get_pagination,
+    get_schema_args,
+    token_required,
+    validate_json_content_type,
+)
 
 
 @ingredients_bp.route('/ingredients', methods=['GET'])
@@ -93,3 +101,4 @@ def delete_ingredient(user_id: int, ingredient_id: int):
         'success': True,
         'message': f'Ingredient with id {ingredient_id} has been deleted'
     })
+

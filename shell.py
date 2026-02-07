@@ -1,7 +1,9 @@
-from food_planner_app import app
+from food_planner_app import create_app, db
+from food_planner_app.models import Ingredient
 
-app.app_context().push()
+app = create_app()
 
-print("Flask context active.")
-print("Available objects: db, Ingredient")
+with app.app_context():
+    print("Flask context active.")
+    print("Available objects:", db, Ingredient)
 

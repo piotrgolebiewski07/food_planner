@@ -1,11 +1,12 @@
-import jwt
 import re
-from flask import url_for, current_app, abort
-from werkzeug.exceptions import UnsupportedMediaType, BadRequest
 from functools import wraps
+
+import jwt
+from flask import abort, current_app, request, url_for
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.sql.expression import BinaryExpression
-from flask import request, url_for
+from werkzeug.exceptions import BadRequest, UnsupportedMediaType
+
 from food_planner_app import Config, db
 
 COMPARISON_OPERATORS_RE = re.compile(r'(.*)\[(eq|gte|gt|lte|lt|ne)\]')

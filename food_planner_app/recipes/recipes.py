@@ -1,11 +1,15 @@
-from flask import request, abort
-from flask import jsonify
-from food_planner_app import db
-from food_planner_app.recipes import recipes_bp
-from food_planner_app.models import Recipe, RecipeIngredient, Ingredient
-from food_planner_app.utils import validate_json_content_type, get_pagination, token_required
-from sqlalchemy import select, func
+from flask import abort, jsonify, request
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
+
+from food_planner_app import db
+from food_planner_app.models import Ingredient, Recipe, RecipeIngredient
+from food_planner_app.recipes import recipes_bp
+from food_planner_app.utils import (
+    get_pagination,
+    token_required,
+    validate_json_content_type,
+)
 
 
 @recipes_bp.route('/recipes', methods=['GET'])
@@ -96,7 +100,7 @@ def random_recipes():
 @recipes_bp.route('/recipes', methods=['POST'])
 @token_required
 @validate_json_content_type
-def create_recipe(user_id: int):
+def create_recipe(_user_id: int):
     data = request.get_json()
 
     recipe = Recipe(
@@ -134,7 +138,7 @@ def create_recipe(user_id: int):
 @recipes_bp.route('/recipes/<int:recipe_id>', methods=['PUT'])
 @token_required
 @validate_json_content_type
-def update_recipe(user_id: int, recipe_id: int):
+def update_recipe(_user_id: int, recipe_id: int):
     data = request.get_json()
 
     recipe = Recipe.query.get_or_404(recipe_id)
@@ -165,7 +169,7 @@ def update_recipe(user_id: int, recipe_id: int):
 
 @recipes_bp.route('/recipes/<int:recipe_id>', methods=['DELETE'])
 @token_required
-def delete_recipe(user_id: int, recipe_id: int):
+def delete_recipe(_user_id: int, recipe_id: int):
     recipe = Recipe.query.get_or_404(recipe_id)
 
     db.session.delete(recipe)
