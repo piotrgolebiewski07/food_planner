@@ -103,6 +103,15 @@ def random_recipes():
 def create_recipe(_user_id: int):
     data = request.get_json()
 
+    required_fields = ["name", "instructions", "ingredients"]
+    missing = [f for f in required_fields if f not in data]
+
+    if missing:
+        return jsonify({
+            "success": False,
+            "message": {f: ["Missing data for required field."] for f in missing}
+        }), 400
+
     recipe = Recipe(
         name=data["name"],
         description=data.get("description"),
