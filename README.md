@@ -1,19 +1,19 @@
 # Food Planner API
 
 Food Planner API is a RESTful backend built with **Flask** and **SQLAlchemy**.
-The project focuses on clean API design, relational data modeling, and
-production-ready backend architecture.
+It provides endpoints for managing **recipes** and **ingredients**, including a many-to-many relationship with domain-specific data (`amount`).
+The project focuses on clean API design, relational modeling, and maintainable backend structure.
 
 It is intentionally backend-only and framework-focused.
 
 ## Key Highlights
 
 - REST API with full CRUD functionality
-- Many-to-many relationships with additional domain data
-- Token-based authentication (JWT)
+- Many-to-many relationships with additional domain data (`amount` in join table)
+- JWT authentication and protected endpoints
 - Pagination, filtering, sorting, and field selection
-- Integration tests using pytest
-- Clean Git workflow with feature branches
+- Integration tests with Pytest
+- Alembic database migrations
 
 ## Features
 
@@ -25,7 +25,7 @@ It is intentionally backend-only and framework-focused.
 
 ### Ingredients (CRUD)
 - List ingredients (pagination, filters, sorting)
-- Retrieve single ingredient
+- Retrieve a single ingredient
 - Create, update and delete ingredients
 - Duplicate protection and validation
 
@@ -46,7 +46,7 @@ GET /api/v1/recipes/random?days=7
 - Flask-SQLAlchemy
 - MySQL
 - Alembic
-- pytest
+- Pytest
   
 ## Project Structure
 
