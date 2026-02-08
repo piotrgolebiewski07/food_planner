@@ -63,10 +63,25 @@ def sample_data(app):
 
 
 @pytest.fixture
+def ingredient_model(app, sample_data):
+    from food_planner_app.models import Ingredient
+
+    with app.app_context():
+        return Ingredient.query.filter_by(name="milk").first()
+
+
+@pytest.fixture
 def ingredient():
     return {
         'name': 'milk',
         'calories': 40,
         'unit': 'ml'
+    }
+
+
+@pytest.fixture
+def auth_headers(token):
+    return {
+        "Authorization": f"Bearer {token}"
     }
 
