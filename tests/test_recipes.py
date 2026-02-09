@@ -112,5 +112,12 @@ def test_get_single_recipe(client, auth_headers, ingredient_model):
     assert data["data"]["ingredients"][0]["name"] == ingredient_model.name
 
 
+def test_get_single_recipes_not_found(client):
+    response = client.get("/api/v1/recipes/1000")
+    data = response.get_json()
+
+    assert response.status_code == 404
+    assert data["success"] is False
+    assert "data" not in data
 
 
