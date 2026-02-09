@@ -45,7 +45,8 @@ def test_create_recipe_missing_token(client, ingredient_model):
         }
     )
     assert response.status_code == 401
-
+    data = response.get_json()
+    assert data["success"] is False
 
 @pytest.mark.parametrize(
     "data, missing_field",
@@ -65,7 +66,7 @@ def test_create_recipe_invalid_data(client, auth_headers, data, missing_field):
 
     assert response.status_code == 400
     assert response_data["success"] is False
-    assert missing_field in response_data["message"]
+    assert isinstance(response_data["message"][missing_field], list)
     assert "data" not in response_data
 
 
@@ -82,6 +83,7 @@ def test_get_recipes_empty(client):
 
 def test_get_recipes(client, auth_headers, ingredient_model):
     response = create_recipe(client, auth_headers, ingredient_model)
+    assert response.status_code == 201
     recipe_id = response.get_json()["data"]["id"]
 
     response = client.get("/api/v1/recipes")
@@ -100,6 +102,7 @@ def test_get_recipes(client, auth_headers, ingredient_model):
 
 def test_get_single_recipe(client, auth_headers, ingredient_model):
     response = create_recipe(client, auth_headers, ingredient_model)
+    assert response.status_code == 201
     recipe_id = response.get_json()["data"]["id"]
 
     response = client.get(f"/api/v1/recipes/{recipe_id}")
@@ -112,7 +115,7 @@ def test_get_single_recipe(client, auth_headers, ingredient_model):
     assert data["data"]["ingredients"][0]["name"] == ingredient_model.name
 
 
-def test_get_single_recipes_not_found(client):
+def test_get_single_recipe_not_found(client):
     response = client.get("/api/v1/recipes/1000")
     data = response.get_json()
 
@@ -121,3 +124,42 @@ def test_get_single_recipes_not_found(client):
     assert "data" not in data
 
 
+def test_delete_recipe_success(client, auth_headers, ingredient_model):
+    response = create_recipe(client, auth_headers, ingredient_model)
+    assert response.status_code == 201
+    recipe_id = response.get_json()["data"]["id"]
+    response = client.delete(
+        f"/api/v1/recipes/{recipe_id}",
+        headers=auth_headers
+    )
+
+    assert response.status_code == 200
+
+    data = response.get_json()
+    assert data["success"] is True
+
+    response = client.get(f"/api/v1/recipes/{recipe_id}")
+    assert response.status_code == 404
+
+
+def test_delete_recipe_missing_token(client, auth_headers, ingredient_model):
+    response = create_recipe(client, auth_headers, ingredient_model)
+    assert response.status_code == 201
+
+    recipe_id = response.get_json()["data"]["id"]
+    response = client.delete(f"/api/v1/recipes/{recipe_id}")
+    assert response.status_code == 401
+    data = response.get_json()
+    assert data["success"] is False
+
+
+def test_delete_recipe_not_found(client, auth_headers):
+    response = client.delete(
+        "/api/v1/recipes/1000",
+        headers=auth_headers
+    )
+    data = response.get_json()
+    assert response.status_code == 404
+    assert response.headers["Content-Type"] == "application/json"
+    assert data["success"] is False
+    assert "data" not in data
