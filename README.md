@@ -1,19 +1,21 @@
 # Food Planner API
 
-Food Planner API is a RESTful backend built with **Flask** and **SQLAlchemy**.
-The project focuses on clean API design, relational data modeling, and
-production-ready backend architecture.
+A backend-only REST API built with **Flask** and **SQLAlchemy** for managing **recipes** and **ingredients**.
+The project focuses on clean API design, relational modeling (many-to-many with domain data), authentication, and integration testing.
 
-It is intentionally backend-only and framework-focused.
+## Why this project
+
+This project was built to practice designing a non-trivial backend: protected endpoints, relational data modeling,
+validation, and automated testing. It aims to be clear, maintainable, and easy to reason about.
 
 ## Key Highlights
 
 - REST API with full CRUD functionality
-- Many-to-many relationships with additional domain data
-- Token-based authentication (JWT)
+- Many-to-many relationship with additional domain data (`amount` in join table)
+- JWT authentication and protected endpoints
 - Pagination, filtering, sorting, and field selection
-- Integration tests using pytest
-- Clean Git workflow with feature branches
+- Integration tests with Pytest
+- Alembic database migrations
 
 ## Features
 
@@ -25,7 +27,7 @@ It is intentionally backend-only and framework-focused.
 
 ### Ingredients (CRUD)
 - List ingredients (pagination, filters, sorting)
-- Retrieve single ingredient
+- Retrieve a single ingredient
 - Create, update and delete ingredients
 - Duplicate protection and validation
 
@@ -35,7 +37,7 @@ It is intentionally backend-only and framework-focused.
 - Create, read, update and delete recipes
 - Random recipe selection endpoint
 
-Example:
+Example endpoint:
 ```
 GET /api/v1/recipes/random?days=7
 ```
@@ -46,7 +48,7 @@ GET /api/v1/recipes/random?days=7
 - Flask-SQLAlchemy
 - MySQL
 - Alembic
-- pytest
+- Pytest
   
 ## Project Structure
 
@@ -60,6 +62,7 @@ food_planner_app/
 tests/
 ├── test_auth.py
 ├── test_ingredients.py
+├── test_recipes.py
 ├── conftest.py
 migrations/
 config.py
@@ -71,7 +74,7 @@ README.md
 The project includes integration tests covering:
 - Authentication flows
 - Ingredients CRUD
-- Validation and authorization rules
+- Recipes creation, Validation and authorization rules
 
 Tests are written using Flask test client and focus on API behavior.
 
