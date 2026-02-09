@@ -166,6 +166,47 @@ def test_create_ingredient_duplicate_name(client, token, ingredient):
     assert response.status_code == 409
 
 
+def test_update_ingredient_success(client, token, ingredient):
+    response = client.post(
+        "/api/v1/ingredients",
+        json=ingredient,
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    ingredient_id = response.get_json()["data"]["id"]
+
+    response = client.put(
+        f"/api/v1/ingredients/{ingredient_id}",
+        json={
+            "name": "milk",
+            "calories": 50,
+            "unit": "ml"
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    data = response.get_json()
+    assert response.status_code == 200
+    assert data["success"] is True
+    assert data["data"]["calories"] == "50.00"
+
+
+def test_update_ingredient_missing_token(client, ingredient):
+    response = client.put(
+        "/api/v1/ingredients/1",
+        json=ingredient
+    )
+    assert response.status_code == 401
+
+
+def test_update_ingredient_not_found(client, token, ingredient):
+    response = client.put(
+        "/api/v1/ingredients/1000",
+        json=ingredient,
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 404
+
+
 def test_delete_ingredient_success(client, token, ingredient):
     response = client.post('/api/v1/ingredients',
                            json=ingredient,
