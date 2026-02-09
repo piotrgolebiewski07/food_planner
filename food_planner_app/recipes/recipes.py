@@ -46,7 +46,10 @@ def get_recipes():
 
 @recipes_bp.route('/recipes/<int:recipe_id>', methods=['GET'])
 def get_recipe(recipe_id: int):
-    recipe = Recipe.query.get_or_404(recipe_id)
+    recipe = db.session.get(Recipe, recipe_id)
+
+    if recipe is None:
+        abort(404)
 
     data = {
         "id": recipe.id,
@@ -150,7 +153,10 @@ def create_recipe(_user_id: int):
 def update_recipe(_user_id: int, recipe_id: int):
     data = request.get_json()
 
-    recipe = Recipe.query.get_or_404(recipe_id)
+    recipe = db.session.get(Recipe, recipe_id)
+
+    if recipe is None:
+        abort(404)
 
     for field in ("name", "description", "servings"):
         if field in data:
@@ -179,7 +185,10 @@ def update_recipe(_user_id: int, recipe_id: int):
 @recipes_bp.route('/recipes/<int:recipe_id>', methods=['DELETE'])
 @token_required
 def delete_recipe(_user_id: int, recipe_id: int):
-    recipe = Recipe.query.get_or_404(recipe_id)
+    recipe = db.session.get(Recipe, recipe_id)
+
+    if recipe is None:
+        abort(404)
 
     db.session.delete(recipe)
     db.session.commit()

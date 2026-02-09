@@ -68,3 +68,49 @@ def test_create_recipe_invalid_data(client, auth_headers, data, missing_field):
     assert missing_field in response_data["message"]
     assert "data" not in response_data
 
+
+def test_get_recipes_empty(client):
+    response = client.get("/api/v1/recipes")
+    data = response.get_json()
+
+    assert response.status_code == 200
+    assert response.headers["Content-Type"] == "application/json"
+    assert data["success"] is True
+    assert data["data"] == []
+    assert data["records_on_page"] == 0
+
+
+def test_get_recipes(client, auth_headers, ingredient_model):
+    response = create_recipe(client, auth_headers, ingredient_model)
+    recipe_id = response.get_json()["data"]["id"]
+
+    response = client.get("/api/v1/recipes")
+    data = response.get_json()
+
+    assert response.status_code == 200
+    assert data["success"] is True
+    assert len(data["data"]) == 1
+
+    recipe = data["data"][0]
+    assert recipe["id"] == recipe_id
+    assert recipe["name"] == "Pasta"
+    assert isinstance(recipe["ingredients"], list)
+    assert recipe["ingredients"][0]["name"] == ingredient_model.name
+
+
+def test_get_single_recipe(client, auth_headers, ingredient_model):
+    response = create_recipe(client, auth_headers, ingredient_model)
+    recipe_id = response.get_json()["data"]["id"]
+
+    response = client.get(f"/api/v1/recipes/{recipe_id}")
+    data = response.get_json()
+
+    assert response.status_code == 200
+    assert data["success"] is True
+    assert data["data"]["id"] == recipe_id
+    assert data["data"]["name"] == "Pasta"
+    assert data["data"]["ingredients"][0]["name"] == ingredient_model.name
+
+
+
+
