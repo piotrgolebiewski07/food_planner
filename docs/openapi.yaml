@@ -1,0 +1,281 @@
+openapi: 3.0.0
+info:
+  title: Food Planner API
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+paths:
+  /api/v1/ingredients:
+    get:
+      tags:
+        - Ingredients
+      summary: Get All Ingredients
+      responses:
+        '200':
+          description: Successful response
+
+    post:
+      tags:
+        - Ingredients
+      summary: Create New Ingredient
+      description: Add new ingredient to the database
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                calories:
+                  type: number
+                unit:
+                  type: string
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+
+  /api/v1/ingredients/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+
+    get:
+      tags:
+        - Ingredients
+      summary: Get Single Ingredient
+      description: Get single ingredient from the database
+      responses:
+        '200':
+          description: Successful response
+
+    put:
+      tags:
+        - Ingredients
+      summary: Update Ingredient
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                unit:
+                  type: string
+      responses:
+        '200':
+          description: Successful response
+
+    delete:
+      tags:
+        - Ingredients
+      summary: Delete Ingredient
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+  /api/v1/recipes:
+    get:
+      tags:
+        - Recipes
+      summary: Get All Recipes
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    post:
+      tags:
+        - Recipes
+      summary: Create New Recipe
+      description: Add a recipe to the database
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: Omelette
+                description: Simple omelette
+                servings: 1
+                ingredients:
+                  - name: egg
+                    amount: 2
+                  - name: milk
+                    amount: 30
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /api/v1/recipes/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+
+    get:
+      tags:
+        - Recipes
+      summary: Get Single Recipe
+      responses:
+        '200':
+          description: Successful response
+
+    put:
+      tags:
+        - Recipes
+      summary: Update Recipe
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Successful response
+
+    delete:
+      tags:
+        - Recipes
+      summary: Delete Recipe
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+  /api/v1/recipes/random:
+    get:
+      tags:
+        - Recipes
+      summary: Get Random Recipes
+      description: Random recipe selection endpoint.
+      parameters:
+        - name: days
+          in: query
+          schema:
+            type: integer
+          example: '5'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /api/v1/auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register User
+      description: Add user to the database
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                username: test
+                email: test@test.com
+                password: test123
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /api/v1/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login User
+      description: Authenticates user and returns JWT token.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                username: test
+                password: test123
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /api/v1/auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Get Current User
+      description: Get Current User details
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /api/v1/auth/update/password:
+    put:
+      tags:
+        - Authentication
+      summary: Update User Password
+      description: Update user password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                current_password: '1234567'
+                new_password: '123456'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /api/v1/auth/update/data:
+    patch:
+      tags:
+        - Authentication
+      summary: Update User Data
+      description: Update username or email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: test@gmail.com
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
