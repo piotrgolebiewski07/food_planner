@@ -18,6 +18,48 @@ from food_planner_app.utils import (
 
 @ingredients_bp.route('/ingredients', methods=['GET'])
 def get_ingredients():
+    """
+    Get all ingredients
+    ---
+    tags:
+      - Ingredients
+    produces:
+      - application/json
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: query
+        name: page
+        type: integer
+        required: false
+        description: Page number
+      - in: query
+        name: per_page
+        type: integer
+        required: false
+        description: Items per page
+    responses:
+      200:
+        description: List of ingredients
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+            data:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+            records_on_page:
+              type: integer
+            pagination:
+              type: object
+    """
     query = select(Ingredient)
     schema_args = get_schema_args(Ingredient)
     query = apply_order(Ingredient, query)
@@ -35,6 +77,38 @@ def get_ingredients():
 
 @ingredients_bp.route('/ingredients/<int:ingredient_id>', methods=['GET'])
 def get_ingredient(ingredient_id: int):
+    """
+    Get ingredient by ID
+    ---
+    tags:
+      - Ingredients
+    produces:
+      - application/json
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: ingredient_id
+        type: integer
+        required: true
+    responses:
+      200:
+        description: Ingredient found
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+            data:
+              type: object
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+      404:
+        description: Ingredient not found
+    """
     ingredient = db.session.get(Ingredient, ingredient_id)
     if not ingredient:
         abort(404, description=f'Ingredient with id {ingredient_id} not found')
@@ -49,6 +123,52 @@ def get_ingredient(ingredient_id: int):
 @validate_json_content_type
 @use_args(ingredient_schema, error_status_code=400)
 def create_ingredient(user_id: int, args: dict):
+    """
+    Create new ingredient
+    ---
+    tags:
+      - Ingredients
+    consumes:
+      - application/json
+    produces:
+      - application/json
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - name
+            - unit
+            - calories
+          properties:
+            name:
+              type: string
+              example: Tomato
+            unit:
+              type: string
+              example: g
+            calories:
+              type: number
+              example: 18
+    responses:
+      201:
+        description: Ingredient created
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+            data:
+              type: object
+      400:
+        description: Validation error
+      409:
+        description: Ingredient already exists
+    """
     ingredient = Ingredient(**args)
 
     try:
@@ -56,10 +176,7 @@ def create_ingredient(user_id: int, args: dict):
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
-        return jsonify({
-            "success": False,
-            "error": "Ingredient with this name already exists"
-        }), 409
+        abort(409, description="Ingredient with this name already exists")
 
     return jsonify({
         "success": True,
@@ -72,6 +189,46 @@ def create_ingredient(user_id: int, args: dict):
 @validate_json_content_type
 @use_args(IngredientSchema(partial=True),  error_status_code=400)
 def update_ingredient(user_id: int, args: dict, ingredient_id: int):
+    """
+    Update ingredient
+    ---
+    tags:
+      - Ingredients
+    consumes:
+      - application/json
+    produces:
+      - application/json
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: ingredient_id
+        type: integer
+        required: true
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Updated Tomato
+    responses:
+      200:
+        description: Ingredient updated
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+            data:
+              type: object
+      400:
+        description: Validation error
+      404:
+        description: Ingredient not found
+    """
     ingredient = db.session.get(Ingredient, ingredient_id)
     if not ingredient:
         abort(404, description=f'Ingredient with id {ingredient_id} not found')
@@ -90,6 +247,33 @@ def update_ingredient(user_id: int, args: dict, ingredient_id: int):
 @ingredients_bp.route('/ingredients/<int:ingredient_id>', methods=['DELETE'])
 @token_required
 def delete_ingredient(user_id: int, ingredient_id: int):
+    """
+    Delete ingredient
+    ---
+    tags:
+      - Ingredients
+    produces:
+      - application/json
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: ingredient_id
+        type: integer
+        required: true
+    responses:
+      200:
+        description: Ingredient deleted
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+            message:
+              type: string
+      404:
+        description: Ingredient not found
+    """
     ingredient = db.session.get(Ingredient, ingredient_id)
     if not ingredient:
         abort(404, description=f'Ingredient with id {ingredient_id} not found')

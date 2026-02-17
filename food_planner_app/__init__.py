@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from flasgger import Swagger
 
 from config import Config
 
@@ -12,6 +13,24 @@ migrate = Migrate()
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
+
+    # Swagger configuration
+    swagger_template = {
+        "swagger": "2.0",
+        "info": {
+            "title": "Food Planner API",
+            "description": "REST API for managing ingredients and recipes",
+            "version": "1.0.0"
+        },
+        "securityDefinitions": {
+            "BearerAuth": {
+                "type": "apiKey",
+                "name": "Authorization",
+                "in": "header"
+            }
+        }
+    }
+    Swagger(app, template=swagger_template)
 
     db.init_app(app)
     migrate.init_app(app, db)
