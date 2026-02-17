@@ -17,12 +17,16 @@ services:
     restart: always
     depends_on:
       - db
-    env_file:
-      - .env
+    environment:
+      SECRET_KEY: supersecretkey
+      SQLALCHEMY_DATABASE_URI: mysql+pymysql://foodapi:1111@db:3306/food_planner
     ports:
       - "5000:5000"
-    command: gunicorn -w 4 -b 0.0.0.0:5000 "food_planner_app:create_app()"
-
+    command: >
+      sh -c "
+      flask --app food_planner_app:create_app db upgrade &&
+      gunicorn -w 4 -b 0.0.0.0:5000 'food_planner_app:create_app()'
+      "
 volumes:
   mysql_data:
 
