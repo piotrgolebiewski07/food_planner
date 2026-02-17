@@ -22,9 +22,16 @@ services:
       SQLALCHEMY_DATABASE_URI: mysql+pymysql://foodapi:1111@db:3306/food_planner
     ports:
       - "5000:5000"
+    volumes:
+      - .:/app
     command: >
       sh -c "
+      until nc -z db 3306; do
+        echo 'Waiting for database...';
+        sleep 2;
+      done;
       flask --app food_planner_app:create_app db upgrade &&
+      python seed.py &&
       gunicorn -w 4 -b 0.0.0.0:5000 'food_planner_app:create_app()'
       "
 volumes:
